@@ -15,6 +15,9 @@ Contributors: Swiss Post, Camptocamp, Brain-Tec</p>
 <p>Using the connector shop owners can automate their processes and save costs and reduce human errors by automatically syncing product data and pushing orders to Odoo.</p>
 <h3>Release History</h3>
 <p>0.5.1<br>
-- initial public commit</p>
+- Initial public commit</p>
+<p>0.5.2<br>
+- Reformat code</p>
+
 <h3>Support</h3>
 Liviu Nicolicioiu – liviu.nicolicioiu@epoint.ro 
