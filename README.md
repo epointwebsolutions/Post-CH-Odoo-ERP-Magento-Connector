@@ -8,7 +8,7 @@ This connector allows full product data posting to Magento from Odoo. It support
 Developed by: epoint SRL (Timisoara/Romania)<br>
 Contributors: Swiss Post, Camptocamp, Brain-Tec</p>
 <h3>Installation:</h3>
-<p>Before installation, be sure to disable the cache from backend: System > Cache Management or refresh the Cache after installation. And disable the Compilation (System > Tools > Compilation).<br>Just drag & drop the 'app' folder in your root of Magento installation.</p>
+<p>Before installation, be sure to disable the cache from backend: System > Cache Management or refresh the Cache after installation. And disable the Compilation (System > Tools > Compilation).<br>Just drag & drop the 'app' and 'lib' folder in your root of Magento installation.</p>
 <p>Note: This will not override the 'app' and 'lib' folders of your Magento installation but new folder/files of the extensions will be placed instead.</p>
 <p>Configuration Note: If you get 'Access Denied' error in System > Configuration, then try to logout & re-login.</p>
 <h3>Usage</h3>
