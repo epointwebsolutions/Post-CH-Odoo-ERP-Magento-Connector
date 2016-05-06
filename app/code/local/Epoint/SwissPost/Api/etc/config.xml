@@ -1,36 +1,36 @@
 <?xml version="1.0"?>
 <config>
-	<modules>
-		<Epoint_SwissPost_Api>
-			<version>0.0.1</version>
-		</Epoint_SwissPost_Api>
-	</modules>
-	<global>
-		<helpers>
-			<swisspost_api>
-				<class>Epoint_SwissPost_Api_Helper</class>
-			</swisspost_api>
-		</helpers>
-	</global>		
-	<adminhtml>
-		<acl>
-			<resources>
-				<admin>
-					<children>
-						<system>
-							<children>
-								<config>
-									<children>
-										<swisspost_api translate="title" module="swisspost_api">
-											<title>SwissPost API Settings</title>
-										</swisspost_api>
-									</children>
-								</config>
-							</children>
-						</system>
-					</children>
-				</admin>
-			</resources>
-		</acl>
-	</adminhtml>
+    <modules>
+        <Epoint_SwissPost_Api>
+            <version>0.0.1</version>
+        </Epoint_SwissPost_Api>
+    </modules>
+    <global>
+        <helpers>
+            <swisspost_api>
+                <class>Epoint_SwissPost_Api_Helper</class>
+            </swisspost_api>
+        </helpers>
+    </global>
+    <adminhtml>
+        <acl>
+            <resources>
+                <admin>
+                    <children>
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <swisspost_api translate="title" module="swisspost_api">
+                                            <title>SwissPost API Settings</title>
+                                        </swisspost_api>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+    </adminhtml>
 </config>

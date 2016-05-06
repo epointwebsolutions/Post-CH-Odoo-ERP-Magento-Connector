@@ -5,51 +5,51 @@
 			<version>0.1.3</version>
 		</Epoint_SwissPost_Catalog>
 	</modules>
-	<global>
-		<helpers>
-			<swisspost_catalog>
-				<class>Epoint_SwissPost_Catalog_Helper</class>
-			</swisspost_catalog>
-		</helpers>
-		<models>
-			<swisspost_catalog>
-				<class>Epoint_SwissPost_Catalog_Model</class>
-			</swisspost_catalog>
-		</models>
-		<resources>
-			<swisspost_catalog_setup>
-				<setup>
-					<module>Epoint_SwissPost_Catalog</module>
-					<class>Mage_Catalog_Model_Resource_Eav_Mysql4_Setup</class>
-				</setup>
-				<connection>
-					<use>core_setup</use>
-				</connection>
-			</swisspost_catalog_setup>
-			<swisspost_catalog_write>
-				<connection>
-					<use>core_write</use>
-				</connection>
-			</swisspost_catalog_write>
-			<swisspost_catalog_read>
-				<connection>
-					<use>core_read</use>
-				</connection>
-			</swisspost_catalog_read>
-		</resources>
-		 <events>
+    <global>
+        <helpers>
+            <swisspost_catalog>
+                <class>Epoint_SwissPost_Catalog_Helper</class>
+            </swisspost_catalog>
+        </helpers>
+        <models>
+            <swisspost_catalog>
+                <class>Epoint_SwissPost_Catalog_Model</class>
+            </swisspost_catalog>
+        </models>
+        <resources>
+            <swisspost_catalog_setup>
+                <setup>
+                    <module>Epoint_SwissPost_Catalog</module>
+                    <class>Mage_Catalog_Model_Resource_Eav_Mysql4_Setup</class>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </swisspost_catalog_setup>
+            <swisspost_catalog_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </swisspost_catalog_write>
+            <swisspost_catalog_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </swisspost_catalog_read>
+        </resources>
+        <events>
             <!-- observer the events -->
             <swisspost_api_order_prepare_line>
                 <observers>
                     <swisspost_catalog>
-                    	<type>singleton</type>
+                        <type>singleton</type>
                         <class>swisspost_catalog/order_observer</class>
                         <method>prepareLine</method>
                     </swisspost_catalog>
                 </observers>
             </swisspost_api_order_prepare_line>
-         </events>
-	</global>
+        </events>
+    </global>
 	<crontab>
 		<jobs>
 			<swisspost_catalog_get_product>
@@ -66,28 +66,28 @@
 			</swisspost_catalog_get_inventory>
 		</jobs>
 	</crontab>
-	<default>
-		<catalog>
-		  <!-- Import product mapping: mage_attribute_code->odoo attribute code -->
-			<swisspost_api>
-				<name>title</name>
-				<sku>product_code</sku>
-				<odoo_id>odoo_id</odoo_id>
-				<weight>weight</weight>
-				<price>list_price</price>
-				<short_description>description_short</short_description>
-				<description>description_long</description>
-				<ean13>ean13</ean13>
-				<width>width</width>
-				<height>height</height>
-				<diameter>diameter</diameter>
-				<uom_name>uom_name</uom_name>
-				<volume>volume</volume>
-				<weight_net>weight_net</weight_net>
-				<manufacturer_website>manufacturer_website</manufacturer_website>
-				<sale_delay>sale_delay</sale_delay>
-				<!--<demo>demo</demo>-->
-			</swisspost_api>
-		</catalog>
-	</default>
+    <default>
+        <catalog>
+            <!-- Import product mapping: mage_attribute_code->odoo attribute code -->
+            <swisspost_api>
+                <name>title</name>
+                <sku>product_code</sku>
+                <odoo_id>odoo_id</odoo_id>
+                <weight>weight</weight>
+                <price>list_price</price>
+                <short_description>description_short</short_description>
+                <description>description_long</description>
+                <ean13>ean13</ean13>
+                <width>width</width>
+                <height>height</height>
+                <diameter>diameter</diameter>
+                <uom_name>uom_name</uom_name>
+                <volume>volume</volume>
+                <weight_net>weight_net</weight_net>
+                <manufacturer_website>manufacturer_website</manufacturer_website>
+                <sale_delay>sale_delay</sale_delay>
+                <!--<demo>demo</demo>-->
+            </swisspost_api>
+        </catalog>
+    </default>
 </config>

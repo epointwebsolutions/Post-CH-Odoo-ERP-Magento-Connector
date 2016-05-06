@@ -1,4 +1,5 @@
 <?php
+
 class Epoint_SwissPostDebug_Model_Observer
 {
     /**
@@ -12,7 +13,8 @@ class Epoint_SwissPostDebug_Model_Observer
         $_type = $_block->getType();
         if ($_type == 'adminhtml/catalog_product_edit') {
 
-            $_block->setChild('product_import_button',
+            $_block->setChild(
+                'product_import_button',
                 $_block->getLayout()->createBlock('swisspostdebug/adminhtml_widget_button')
             );
 
@@ -28,29 +30,39 @@ class Epoint_SwissPostDebug_Model_Observer
                 }
             }
         }
-        
+
     }
+
     /**
      * Add connect button on sales order
      * Listen: adminhtml_widget_container_html_before
+     *
      * @param Varien_Event_Observer $observer
      */
-    function adminhtmlWidgetContainerHtmlBefore(Varien_Event_Observer $observer){
-	   	$block = $observer->getEvent()->getBlock();
-	    if ($block instanceof Mage_Adminhtml_Block_Sales_Order_View) {
-	    	$order = $observer->getOrder();
-			// is connected	?
-	    	if($order && is_object($order) && $order->getData(Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID)){
-	    		$label = Mage::helper('swisspostdebug')->__('Export to SwissPost (%s)', Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID);
-	    	}else{
-	    		$label = Mage::helper('swisspostdebug')->__('Export to SwissPost');
-	    	}
-	        $block->addButton('sendapi', array(
-	            'label'     => $label,
-	            'onclick'   => "setLocation('{$block->getUrl('*/sales_order_sendapi/order')}')",
-	            'class'     => 'go'
-	        )
-	       );
-	    }
+    function adminhtmlWidgetContainerHtmlBefore(Varien_Event_Observer $observer)
+    {
+        $block = $observer->getEvent()->getBlock();
+        if ($block instanceof Mage_Adminhtml_Block_Sales_Order_View) {
+            $order = $observer->getOrder();
+            // is connected	?
+            if ($order && is_object($order)
+                && $order->getData(
+                    Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID
+                )
+            ) {
+                $label = Mage::helper('swisspostdebug')->__(
+                    'Export to SwissPost (%s)', Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID
+                );
+            } else {
+                $label = Mage::helper('swisspostdebug')->__('Export to SwissPost');
+            }
+            $block->addButton(
+                'sendapi', array(
+                    'label'   => $label,
+                    'onclick' => "setLocation('{$block->getUrl('*/sales_order_sendapi/order')}')",
+                    'class'   => 'go'
+                )
+            );
+        }
     }
 }

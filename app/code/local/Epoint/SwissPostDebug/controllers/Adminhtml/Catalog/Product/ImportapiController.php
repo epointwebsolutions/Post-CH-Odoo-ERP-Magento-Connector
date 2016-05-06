@@ -1,8 +1,13 @@
 <?php
 include_once('Mage/Adminhtml/controllers/Catalog/ProductController.php');
 
-class Epoint_SwissPostDebug_Adminhtml_Catalog_Product_ImportapiController extends Mage_Adminhtml_Catalog_ProductController
+class Epoint_SwissPostDebug_Adminhtml_Catalog_Product_ImportapiController
+    extends Mage_Adminhtml_Catalog_ProductController
 {
+
+    /**
+     * Import action
+     */
     public function importAction()
     {
         $product = $this->_initProduct();
@@ -12,10 +17,10 @@ class Epoint_SwissPostDebug_Adminhtml_Catalog_Product_ImportapiController extend
             $result = Mage::helper('swisspost_api/Product')->getProducts($options);
             $items = $result->getValues();
 
-            if(!empty($items)){
+            if (!empty($items)) {
                 Mage::getModel('swisspost_catalog/Products')->import($items);
                 $this->_getSession()->addSuccess($this->__('The product has been imported.'));
-            }else{
+            } else {
                 throw new Exception(print_r($result->getDebug(), 1));
             }
 

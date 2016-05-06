@@ -14,12 +14,14 @@ class Epoint_SwissPostDebug_Block_Adminhtml_Widget_Button extends Mage_Adminhtml
     {
         $this->_product = Mage::registry('current_product');
         parent::_construct();
-        $this->setData(array(
-            'label'     => Mage::helper('swisspostdebug')->__('Import from SwissPost'),
-            //'onclick'   => 'window.open(\''.Mage::getModel('core/url')->getUrl() . $this->_product->getUrlPath() .'\')',
-            'onclick'   => "setLocation('{$this->getUrl('*/catalog_product_importapi/import/id/'.$this->_product->getId())}')",
-            'title' => Mage::helper('swisspostdebug')->__('Import from Swiss')
-        ));
+        $this->setData(
+            array(
+                'label'   => Mage::helper('swisspostdebug')->__('Import from SwissPost'),
+                //'onclick'   => 'window.open(\''.Mage::getModel('core/url')->getUrl() . $this->_product->getUrlPath() .'\')',
+                'onclick' => "setLocation('{$this->getUrl('*/catalog_product_importapi/import/id/'.$this->_product->getId())}')",
+                'title'   => Mage::helper('swisspostdebug')->__('Import from Swiss')
+            )
+        );
     }
 
     /**

@@ -1,145 +1,147 @@
 <?xml version="1.0"?>
 <config>
-	<sections>
-		<swisspost_api translate="label" module="swisspostsales">
-			<sort_order>1234</sort_order>
-			<show_in_default>1</show_in_default>
-			<show_in_website>0</show_in_website>
-			<show_in_store>o</show_in_store>
-			<groups>
-				<order translate="label comment" module="swisspostsales">
-					<label>Order setttings</label>
-					<frontend_type>text</frontend_type>
-					<sort_order>1234</sort_order>
-					<show_in_default>1</show_in_default>
-					<show_in_website>0</show_in_website>
-					<show_in_store>0</show_in_store>
-					<fields>
-						<enable_cron translate="label">
-							<label>Use cron to send orders</label>
-							<frontend_type>select</frontend_type>
-							<sort_order>0</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>0</show_in_website>
-							<show_in_store>0</show_in_store>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<comment>If is enabled the order will be send over the cron</comment>
-						</enable_cron>
-						<enable_realtime translate="label">
-							<label>Send order on creation</label>
-							<frontend_type>select</frontend_type>
-							<sort_order>10</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>0</show_in_website>
-							<show_in_store>0</show_in_store>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
-							<comment>If is enabled the order will be send over the cron</comment>
-						</enable_realtime>
-						<default_values translate="label">
-							<label>Default values</label>
-							<frontend_type>textarea</frontend_type>
-							<sort_order>20</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>0</show_in_website>
-							<show_in_store>0</show_in_store>
-							<comment>Format: odoo_field_name|default_value, one entry per line</comment>
-						</default_values>
-					</fields>
-				</order>
-				<order_payment_method translate="label comment" module="swisspostsales">
-					<label>Order payments method mapping</label>
-					<frontend_type>text</frontend_type>
-					<sort_order>1234</sort_order>
-					<show_in_default>1</show_in_default>
-					<show_in_website>0</show_in_website>
-					<show_in_store>0</show_in_store>
-					<fields>
-						<default translate="label">
-							<label>Fallback payment method</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>1</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>0</show_in_website>
-							<show_in_store>0</show_in_store>
-							<comment>Default payment method</comment>
-						</default>
-						<mapping translate="label">
-							<label>Mapping values</label>
-							<frontend_type>textarea</frontend_type>
-							<sort_order>10</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>0</show_in_website>
-							<show_in_store>0</show_in_store>
-							<comment>Format: magento_payment_code|odoo_payment_code, one entry per line</comment>
-						</mapping>
-					</fields>
-				</order_payment_method>
-				<order_shipping_method translate="label comment" module="swisspostsales">
-					<label>Order shippings method mapping</label>
-					<frontend_type>text</frontend_type>
-					<sort_order>1234</sort_order>
-					<show_in_default>1</show_in_default>
-					<show_in_website>0</show_in_website>
-					<show_in_store>0</show_in_store>
-					<fields>
-						<default translate="label">
-							<label>Fallback shipping method</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>1</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>0</show_in_website>
-							<show_in_store>0</show_in_store>
-							<comment>Default shipping method</comment>
-						</default>
-						<mapping translate="label">
-							<label>Shipping magento/odoo mapping values</label>
-							<frontend_type>textarea</frontend_type>
-							<sort_order>10</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>0</show_in_website>
-							<show_in_store>0</show_in_store>
-							<comment>Format: magento_shipping_code|odoo_shipping_code, one entry per line.</comment>
-						</mapping>
-						<default_shipping_sku translate="label">
-							<label>Shipping product sku, added on order</label>
-							<frontend_type>text</frontend_type>
-							<sort_order>30</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>0</show_in_website>
-							<show_in_store>0</show_in_store>
-							<comment>Shipping product that will be added on products line from order.</comment>
-						</default_shipping_sku>
-						<mapping2products translate="label">
-							<label>Shipping product to shipping mapping values</label>
-							<frontend_type>textarea</frontend_type>
-							<sort_order>40</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>0</show_in_website>
-							<show_in_store>0</show_in_store>
-							<comment>Format: magento product sku| magento shipping method.</comment>
-						</mapping2products>
-					</fields>
-				</order_shipping_method>
-				<discount translate="label comment" module="swisspostsales">
-					<label>Discount mapping</label>
-					<frontend_type>text</frontend_type>
-					<sort_order>12345</sort_order>
-					<show_in_default>1</show_in_default>
-					<show_in_website>0</show_in_website>
-					<show_in_store>0</show_in_store>
-					<fields>
-						<mapping2products translate="label">
-							<label>Discount sku to shipping mapping values</label>
-							<frontend_type>textarea</frontend_type>
-							<sort_order>40</sort_order>
-							<show_in_default>1</show_in_default>
-							<show_in_website>0</show_in_website>
-							<show_in_store>0</show_in_store>
-							<comment>Format: magento product sku| Magento discount rule id. Ex: If is a catalog rule: SKU1|catalog:1, if is a shopping cart rule: SKU2|shoppingcart:1</comment>
-						</mapping2products>
-					</fields>
-				</discount>
-			</groups>
-		</swisspost_api>
-	</sections>
+    <sections>
+        <swisspost_api translate="label" module="swisspostsales">
+            <sort_order>1234</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>0</show_in_website>
+            <show_in_store>o</show_in_store>
+            <groups>
+                <order translate="label comment" module="swisspostsales">
+                    <label>Order setttings</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>1234</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <enable_cron translate="label">
+                            <label>Use cron to send orders</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>0</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <comment>If is enabled the order will be send over the cron</comment>
+                        </enable_cron>
+                        <enable_realtime translate="label">
+                            <label>Send order on creation</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <comment>If is enabled the order will be send over the cron</comment>
+                        </enable_realtime>
+                        <default_values translate="label">
+                            <label>Default values</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Format: odoo_field_name|default_value, one entry per line</comment>
+                        </default_values>
+                    </fields>
+                </order>
+                <order_payment_method translate="label comment" module="swisspostsales">
+                    <label>Order payments method mapping</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>1234</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <default translate="label">
+                            <label>Fallback payment method</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Default payment method</comment>
+                        </default>
+                        <mapping translate="label">
+                            <label>Mapping values</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Format: magento_payment_code|odoo_payment_code, one entry per line</comment>
+                        </mapping>
+                    </fields>
+                </order_payment_method>
+                <order_shipping_method translate="label comment" module="swisspostsales">
+                    <label>Order shippings method mapping</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>1234</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <default translate="label">
+                            <label>Fallback shipping method</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Default shipping method</comment>
+                        </default>
+                        <mapping translate="label">
+                            <label>Shipping magento/odoo mapping values</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Format: magento_shipping_code|odoo_shipping_code, one entry per line.</comment>
+                        </mapping>
+                        <default_shipping_sku translate="label">
+                            <label>Shipping product sku, added on order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Shipping product that will be added on products line from order.</comment>
+                        </default_shipping_sku>
+                        <mapping2products translate="label">
+                            <label>Shipping product to shipping mapping values</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Format: magento product sku| magento shipping method.</comment>
+                        </mapping2products>
+                    </fields>
+                </order_shipping_method>
+                <discount translate="label comment" module="swisspostsales">
+                    <label>Discount mapping</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>12345</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <mapping2products translate="label">
+                            <label>Discount sku to shipping mapping values</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Format: magento product sku| Magento discount rule id. Ex: If is a catalog rule:
+                                SKU1|catalog:1, if is a shopping cart rule: SKU2|shoppingcart:1
+                            </comment>
+                        </mapping2products>
+                    </fields>
+                </discount>
+            </groups>
+        </swisspost_api>
+    </sections>
 </config>
