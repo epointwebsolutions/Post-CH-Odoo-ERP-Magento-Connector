@@ -9,7 +9,7 @@ Developed by: epoint SRL (Timisoara/Romania)<br>
 Contributors: Swiss Post, Camptocamp, Brain-Tec</p>
 <h3>Installation:</h3>
 <p>Before installation, be sure to disable the cache from backend: System > Cache Management or refresh the Cache after installation. And disable the Compilation (System > Tools > Compilation).<br>Just drag & drop the 'app' folder in your root of Magento installation.</p>
-<p>Note: This will not override the 'app' folder of your Magento installation but new folder/files of the extensions will be placed instead.</p>
+<p>Note: This will not override the 'app' and 'lib' folders of your Magento installation but new folder/files of the extensions will be placed instead.</p>
 <p>Configuration Note: If you get 'Access Denied' error in System > Configuration, then try to logout & re-login.</p>
 <h3>Usage</h3>
 <p>Using the connector shop owners can automate their processes and save costs and reduce human errors by automatically syncing product data and pushing orders to Odoo.</p>
