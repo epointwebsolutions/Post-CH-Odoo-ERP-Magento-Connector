@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<Epoint_SwissPostSales>
+			<version>0.0.1</version>
+		</Epoint_SwissPostSales>
+	</modules>
+	<!-- Mapping for order object, the values are post processed after-->
+	<default>
+		<order>
+			<swisspost_api>
+				<order_ref>entity_id</order_ref>
+				<client_order_ref>increment_id</client_order_ref>
+				<date_order>created_at</date_order>
+				<delivery_method>--</delivery_method>
+				<payment_method>--</payment_method>
+			</swisspost_api>
+		</order>
+	</default>
+	<!-- End Mapping -->
+	<global>
+		<helpers>
+			<swisspostsales>
+				<class>Epoint_SwissPostSales_Helper</class>
+			</swisspostsales>
+		</helpers>
+		 <models>
+            <swisspostsales>
+                <class>Epoint_SwissPostSales_Model</class>
+            </swisspostsales>
+        </models>
+       <resources>
+            <swisspostsales_setup>
+                <setup>
+                    <module>Epoint_SwissPostSales</module>
+                    <class>Mage_Catalog_Model_Resource_Setup</class>
+                </setup>
+            </swisspostsales_setup>
+        </resources>
+		   <events>
+		   <!-- observe the event -->
+            <sales_order_save_after>
+                <observers>
+                    <swisspost_order>
+                        <class>swisspostsales/order_observer</class>
+                        <method>afterOrderSave</method>
+                    </swisspost_order>
+                </observers>
+            </sales_order_save_after>
+             <swisspost_api_before_create_order>
+                <observers>
+                    <sales_swisspost_api_before_create_order_observer>
+                        <type>singleton</type>
+                        <class>swisspostsales/order_observer</class>
+                        <method>SwissPostApiBeforeCreateOrder</method>
+                    </sales_swisspost_api_before_create_order_observer>
+                </observers>
+            </swisspost_api_before_create_order>
+            <swisspost_api_after_create_order>
+                <observers>
+                    <customer_swisspost_api_after_create_order_observer>
+                    	<type>singleton</type>
+                        <class>swisspostsales/order_observer</class>
+                        <method>SwissPostApiAfterCreateOrder</method>
+                    </customer_swisspost_api_after_create_order_observer>
+                </observers>
+            </swisspost_api_after_create_order>
+        </events>
+	</global>
+	<adminhtml>
+		<acl>
+			<resources>
+				<admin>
+					<children>
+						<system>
+							<children>
+								<config>
+									<children>
+										<swisspost_api translate="title" module="swisspostsales">
+											<title>SwissPost Sales Settings</title>
+										</swisspost_api>
+									</children>
+								</config>
+							</children>
+						</system>
+					</children>
+				</admin>
+			</resources>
+		</acl>
+	</adminhtml>		
+	 <crontab>
+		<jobs>
+			<swisspostsales_send_orders>
+				<schedule><cron_expr>* * * * *</cron_expr></schedule>
+				<run><model>swisspostsales/Order_Cron::send</model></run>
+			</swisspostsales_send_orders>
+			<swisspostsales_receive_orders>
+				<schedule><cron_expr>30 * * * *</cron_expr></schedule>
+				<run><model>swisspostsales/Order_Cron::receive</model></run>
+			</swisspostsales_receive_orders>
+			<swisspostsales_receive_shipping>
+				<schedule><cron_expr>* 0,4,8,12,16,18 * * *</cron_expr></schedule>
+				<run><model>swisspostsales/Shipping_Cron::update</model></run>
+			</swisspostsales_receive_shipping>
+		</jobs>
+		<jobs>
+		</jobs>
+	</crontab>
+</config>

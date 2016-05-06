@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<config>
+	<sections>
+		<swisspost_api translate="label" module="swisspost_catalog">
+			<sort_order>12345</sort_order>
+			<show_in_default>1</show_in_default>
+			<show_in_website>0</show_in_website>
+			<show_in_store>0</show_in_store>
+			<groups>
+				<product translate="label comment" module="swisspost_catalog">
+					<label>Product settings</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>12345</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>0</show_in_website>
+					<show_in_store>0</show_in_store>
+					<fields>
+						<default_values translate="label">
+							<label>Default values</label>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+							<comment>Format: odoo_field_name|default_value, one entry per line</comment>
+						</default_values>
+						<dynamic_attribute_mapping translate="label">
+							<label>Dinamyc attribute mapping values</label>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>15</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+							<comment>Format: odoo_attribue_code|mage_attribue_code, one entry per line</comment>
+						</dynamic_attribute_mapping>
+						<tax_class_id_attribue_code translate="label">
+							<label>Odoo tax class id attribute</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>20</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</tax_class_id_attribue_code>
+						<tax_class_mapping translate="label">
+							<label>Product tax class mapping</label>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>30</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+							<comment>Format:odoo_tax_class_id|magento_tax_class_id</comment>
+						</tax_class_mapping>
+						<disabled_products_by_type translate="label">
+							<label>Disable product types</label>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>50</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+							<comment>Multiple values commas separated, rormat: odoo_type1,odoo_type2, odoo_type2</comment>
+						</disabled_products_by_type>
+						<import_images translate="label">
+							<label>Import images</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</import_images>
+					</fields>
+				</product>
+				<category translate="label comment" module="swisspost_catalog">
+					<label>Categoery settings</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>123456</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>0</show_in_website>
+					<show_in_store>0</show_in_store>
+					<fields>
+						<import_from translate="label">
+							<label>Import from categories</label>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+							<comment>Format: Odoo categories ids, comma separated </comment>
+						</import_from>
+					</fields>
+				</category>
+				<product_stores translate="label comment" module="swisspost_catalog">
+					<label>Mapping website attribute by Odoo language code and store view</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>12346</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>0</show_in_website>
+					<show_in_store>0</show_in_store>
+					<fields>
+						<mapping_code translate="label">
+							<label>Magento Store view code/Odoo language code</label>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+							<comment>Exemple: magento_store_view_code|attribute_code_list</comment>
+						</mapping_code>
+					</fields>
+				</product_stores>
+			</groups>
+		</swisspost_api>
+	</sections>
+</config>

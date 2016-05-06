@@ -1,0 +1,8 @@
+<config>
+  <modules>
+    <Epoint_SwissPost_Api>
+      <active>true</active>
+      <codePool>local</codePool>
+    </Epoint_SwissPost_Api>
+  </modules>
+</config>

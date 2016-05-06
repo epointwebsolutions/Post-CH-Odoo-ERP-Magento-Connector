@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<config>
+	<sections>
+		<swisspost_api translate="label" module="swisspost_customer">
+			<sort_order>1234</sort_order>
+			<show_in_default>1</show_in_default>
+			<show_in_website>0</show_in_website>
+			<show_in_store>0</show_in_store>
+			<groups>
+				<customer translate="label comment" module="swisspost_customer">
+					<label>Customer settings</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>1234</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>0</show_in_website>
+					<show_in_store>0</show_in_store>
+					<fields>
+						<default_values translate="label">
+							<label>Default values</label>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+							<comment>Format: odoo_field_name|default_value, one entry per line</comment>
+						</default_values>
+						<default_group translate="label">
+							<label>Default group name</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>20</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+							<comment>Default group sent to Odoo</comment>
+						</default_group>
+						<group_mapping translate="label">
+							<label>Group mapping</label>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>30</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+							<comment>Format: Magento Group ID|ODoo Group ID, one entry per line</comment>
+						</group_mapping>
+					</fields>
+				</customer>
+				<address translate="label comment" module="swisspost_customer">
+					<label>Address default value</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>1234</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>0</show_in_website>
+					<show_in_store>0</show_in_store>
+					<fields>
+						<default_values translate="label">
+							<label>Default values</label>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+							<comment>Format: odoo_field_name|default_value, one entry per line</comment>
+						</default_values>
+					</fields>
+				</address>
+			</groups>
+		</swisspost_api>
+	</sections>
+</config>
