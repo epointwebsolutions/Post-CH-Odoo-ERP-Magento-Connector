@@ -19,7 +19,7 @@ class Epoint_SwissPostSales_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return bool
      */
-    public static function hasBeenProcessed($order)
+    public static function OrderHasBeenProcessed($order)
     {
         if ($order->getData(ORDER_ATTRIBUTE_CODE_ODOO_ID)) {
             return true;

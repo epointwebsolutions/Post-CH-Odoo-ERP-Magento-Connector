@@ -77,7 +77,6 @@ class Epoint_SwissPost_Api_Helper_Data extends Mage_Core_Helper_Abstract
         $message = Mage::helper('core')->__('API CALL %s', print_r($data, 1));
         self::log($message, $logLevel);
     }
-
     /**
      * Return array mapping
      *
@@ -161,13 +160,21 @@ class Epoint_SwissPost_Api_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return bool
      */
-    public function attributeEavExists($attCode)
+    public static function attributeEavExists($attCode)
     {
-        if (Mage::getResourceModel('catalog/eav_attribute')->getIdByCode('catalog_product', $attCode)) {
-            return true;
+    	static $processed;
+    	if(!isset($processed)){
+    		$processed = array();
+    	}
+    	if(isset($processed[$attCode])){
+    		return $processed[$attCode];
+    	}
+    	$processed[$attCode] = false;
+    	$attribute = Mage::getModel('catalog/resource_eav_attribute')->loadByCode('catalog_product', $attCode);
+        if ($attribute && $attribute->getId() !== null) {
+            $processed[$attCode] = true;
         }
-
-        return false;
+		return $processed[$attCode];	
     }
 
     /**
@@ -178,7 +185,7 @@ class Epoint_SwissPost_Api_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return array
      */
-    public function extractDefaultValues($path)
+    public static function extractDefaultValues($path)
     {
         return self::textToArray(Mage::getStoreConfig($path));
     }
@@ -200,12 +207,15 @@ class Epoint_SwissPost_Api_Helper_Data extends Mage_Core_Helper_Abstract
         $lines = explode($lineSeparator, $string);
         $values = array();
         foreach ($lines as $line) {
-            @list($key, $value) = explode($attributeSeparator, trim($line), 2);
-            if ($key && $key[0] != $ignoreLinesStartWith) {
-                $values[$key] = $value;
+            if($attributeSeparator){
+              @list($key, $value) = explode($attributeSeparator, trim($line), 2);
+              if ($key && $key[0] != $ignoreLinesStartWith) {
+                  $values[$key] = $value;
+              }  
+            }elseif(trim($line)){
+                $values[$line] = $line;
             }
         }
-
         return $values;
     }
 

@@ -66,7 +66,13 @@ class Epoint_SwissPost_Customer_Helper_Address extends Mage_Core_Helper_Abstract
             $address_values['address_maintag'] = 'b2c';
         }
         if (!isset($address_values['address_title'])) {
-            $address_values['address_title'] = Mage::helper('swisspost_api')->__toTitle($customerAddress->getPrefix());
+            $addressTitle = 'MRS';
+            if ($customerAddress->getPrefix()) {
+                $addressTitle = strtoupper(preg_replace('/[^A-Za-z0-9\-]/', '', $customerAddress->getPrefix()));
+            } elseif ($customerAddress->getGender() == 1) {
+                $addressTitle = 'MR';
+            }
+            $address_values['address_title'] = $addressTitle;
         }
         if (!isset($address_values['address_company'])) {
             $address_values['address_company'] = $customerAddress->getCompany();
@@ -75,8 +81,10 @@ class Epoint_SwissPost_Customer_Helper_Address extends Mage_Core_Helper_Abstract
             $address_values['address_street'] = $customerAddress->getStreet(1);
         }
         if (!($address_values['address_street2'])) {
-            //$address_values['address_street2'] = $customerAddress->getStreet2();
             $address_values['address_street2'] = $customerAddress->getDepartment();
+        }
+        if (!($address_values['address_po_box'])) {
+            $address_values['address_po_box'] = $customerAddress->getPobox();
         }
         //address_street_no
         if (!isset($address_values['address_zip'])) {

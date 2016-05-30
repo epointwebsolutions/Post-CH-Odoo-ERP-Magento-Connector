@@ -18,6 +18,10 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_CONFIG_DISABLED_PRODUCTS_BY_TYPE = 'swisspost_api/product/disabled_products_by_type';
     const XML_CONFIG_IMPORT_CATEGORY_FROM = 'swisspost_api/category/import_from';
     const XML_CONFIG_ENABLE_IMPORT_IMAGES = 'swisspost_api/product/import_images';
+    const XML_CONFIG_IMPORT_LIMIT = 'swisspost_api/product/import_limit';
+    const XML_CONFIG_ENABLE_IMPORT_FILTER_CHANGED = 'swisspost_api/product/import_filter_changed';
+    const XML_CONFIG_IMPORT_LAST_DATE = 'swisspost_api/product/import_last_date';
+    const XML_CONFIG_IMPORT_CUSTOM_ORDER = 'swisspost_api/product/import_custom_order';
 
     /**
      * Get field for attribute mapping

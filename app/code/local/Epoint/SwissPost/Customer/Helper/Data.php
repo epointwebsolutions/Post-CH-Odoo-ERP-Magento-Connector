@@ -55,7 +55,7 @@ class Epoint_SwissPost_Customer_Helper_Data extends Mage_Core_Helper_Abstract
             $account_values['account_website'] = $customer->getWebsiteId();
         }
         // Custom behavior
-        if (!($account_values['account_function'])) {
+        if (!isset($account_values['account_function'])) {
             if ($customer->getData('concordat_number')) {
                 $account_values['account_function'] = $customer->getData('concordat_number');
             }
@@ -70,23 +70,23 @@ class Epoint_SwissPost_Customer_Helper_Data extends Mage_Core_Helper_Abstract
         $address_id = $customer->getDefaultBilling();
         if ((int)$address_id) {
             $address = Mage::getModel('customer/address')->load($address_id);
-            if (!($account_values['account_company'])) {
+            if (!isset($account_values['account_company'])) {
                 $account_values['account_company'] = $address->getCompany();
             }
-            if (!($account_values['account_street'])) {
+            if (!isset($account_values['account_street'])) {
                 $account_values['account_street'] = $address->getStreet1();
             }
             //account_street_no
-            if (!($account_values['account_zip'])) {
+            if (!isset($account_values['account_zip'])) {
                 $account_values['account_zip'] = $address->getPostcode();
             }
-            if (!($account_values['account_city'])) {
+            if (!isset($account_values['account_city'])) {
                 $account_values['account_city'] = $address->getCity();
             }
-            if (!($account_values['account_country'])) {
+            if (!isset($account_values['account_country'])) {
                 $account_values['account_country'] = $address->getCountry();
             }
-            if (!($account_values['account_phone'])) {
+            if (!isset($account_values['account_phone'])) {
                 $account_values['account_phone'] = $address->getTelephone();
             }
             if (isset($account_values['account_zip'])) {
@@ -94,21 +94,24 @@ class Epoint_SwissPost_Customer_Helper_Data extends Mage_Core_Helper_Abstract
                     $account_values['account_zip'], $account_values['account_country']
                 );
             }
-            if (!$account_values['account_street2']) {
+            if (!isset($account_values['account_street2'])) {
                 //$account_values['account_street2'] = $address->getStreet2();
                 $account_values['account_street2'] = $address->getDepartment();
             }
             // Custom behavior
-            if (!($account_values['account_function'])) {
+            if (!isset($account_values['account_function'])) {
                 if ($address->getData('concordat_number')) {
                     $account_values['account_function'] = $address->getData('concordat_number');
                 }
             }
-            if (!($account_values['account_mobile'])) {
+            if (!isset($account_values['account_mobile'])) {
                 $account_values['account_mobile'] = $address->getTelephone();
             }
-            if (!($account_values['account_fax'])) {
+            if (!isset($account_values['account_fax'])) {
                 $account_values['account_fax'] = $address->getFax();
+            }
+            if (!isset($account_values['account_po_box'])) {
+                $account_values['account_po_box'] = $address->getPobox();
             }
         }
         // attach group.
@@ -116,7 +119,7 @@ class Epoint_SwissPost_Customer_Helper_Data extends Mage_Core_Helper_Abstract
         if ($groupName) {
             $account_values['account_categories'][] = $groupName;
         }
-        $language_code = self::__toSwissPostLanguage($customer->getStoreId());
+        $language_code = self::__toSwissPostLanguage($customer->getOrderStoreId() ? $customer->getOrderStoreId() : $customer->getStoreId());
         if ($language_code) {
             $account_values['account_lang'] = $language_code;
         }

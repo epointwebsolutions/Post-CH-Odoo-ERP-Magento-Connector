@@ -17,6 +17,7 @@
                 <account_city>city</account_city>
                 <account_function>concordat_number</account_function>
                 <account_street2>department</account_street2>
+                <account_po_box>pobox</account_po_box>
             </swisspost_api>
         </customer>
         <anonymous_customer>
@@ -28,6 +29,7 @@
                 <account_city>city</account_city>
                 <account_function>concordat_number</account_function>
                 <account_street2>department</account_street2>
+                <account_po_box>pobox</account_po_box>
             </swisspost_api>
         </anonymous_customer>
         <!--Address-->
@@ -46,6 +48,7 @@
                 <address_mobile>telephone</address_mobile>
                 <address_fax>fax</address_fax>
                 <address_street2>department</address_street2>
+                <address_po_box>pobox</address_po_box>
             </swisspost_api>
         </address>
         <!--Address-->
@@ -133,6 +136,7 @@
                     </swisspost_customer>
                 </observers>
             </customer_delete_before>
+            <!--
             <customer_address_save_after>
                 <observers>
                     <customer_addres_after_save_viv_observer>
@@ -142,6 +146,7 @@
                     </customer_addres_after_save_viv_observer>
                 </observers>
             </customer_address_save_after>
+            -->
             <swisspost_api_before_create_update_address>
                 <observers>
                     <customer_addres_before_save_address_observer>
@@ -212,6 +217,15 @@
                     </customer_swisspost_api_after_create_update_anonymous_account_observer>
                 </observers>
             </swisspost_api_after_create_update_anonymous_account>
+            <payment_method_is_active>
+            <observers>
+                <customer_swisspost_api>
+                    <type>singleton</type>
+                    <class>swisspost_customer/payment_observer</class>
+                    <method>IsActive</method>
+                </customer_swisspost_api>
+            </observers>
+        </payment_method_is_active>
         </events>
     </global>
     <adminhtml>

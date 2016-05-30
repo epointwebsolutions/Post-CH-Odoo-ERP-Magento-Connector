@@ -5,19 +5,6 @@
             <version>0.0.1</version>
         </Epoint_SwissPostSales>
     </modules>
-    <!-- Mapping for order object, the values are post processed after-->
-    <default>
-        <order>
-            <swisspost_api>
-                <order_ref>entity_id</order_ref>
-                <client_order_ref>increment_id</client_order_ref>
-                <date_order>created_at</date_order>
-                <delivery_method>--</delivery_method>
-                <payment_method>--</payment_method>
-            </swisspost_api>
-        </order>
-    </default>
-    <!-- End Mapping -->
     <global>
         <helpers>
             <swisspostsales>
@@ -88,6 +75,17 @@
             </resources>
         </acl>
     </adminhtml>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <swisspostsales before="Mage_Adminhtml">Epoint_SwissPostSales_Adminhtml</swisspostsales>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
     <crontab>
         <jobs>
             <swisspostsales_send_orders>
@@ -98,17 +96,9 @@
                     <model>swisspostsales/Order_Cron::send</model>
                 </run>
             </swisspostsales_send_orders>
-            <swisspostsales_receive_orders>
-                <schedule>
-                    <cron_expr>30 * * * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>swisspostsales/Order_Cron::receive</model>
-                </run>
-            </swisspostsales_receive_orders>
             <swisspostsales_receive_shipping>
                 <schedule>
-                    <cron_expr>* 0,4,8,12,16,18 * * *</cron_expr>
+                    <cron_expr>0 1 * * *</cron_expr>
                 </schedule>
                 <run>
                     <model>swisspostsales/Shipping_Cron::update</model>
@@ -118,4 +108,17 @@
         <jobs>
         </jobs>
     </crontab>
+    <!-- Mapping for order object, the values are post processed after-->
+    <default>
+        <order>
+            <swisspost_api>
+                <order_ref>entity_id</order_ref>
+                <client_order_ref>increment_id</client_order_ref>
+                <date_order>created_at</date_order>
+                <delivery_method>--</delivery_method>
+                <payment_method>--</payment_method>
+            </swisspost_api>
+        </order>
+    </default>
+    <!-- End Mapping -->
 </config>

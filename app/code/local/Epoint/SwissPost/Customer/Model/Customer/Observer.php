@@ -46,6 +46,7 @@ class Epoint_SwissPost_Customer_Model_Customer_Observer
      * odoo account address.
      *
      * @param Varien_Event_Observer $observer
+     *  -- temporary disabled.
      */
     public function afterAddressSave(Varien_Event_Observer $observer)
     {
@@ -89,15 +90,14 @@ class Epoint_SwissPost_Customer_Model_Customer_Observer
                 $address, $order, $mapping = 'order_account_anonymous'
             );
             unset($account['active']);
-            unset($account['account_lang']);
             $sale_order->account = $account;
         } else {
             $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
             $connection = Mage::getModel('swisspost_customer/odoo')->loadByOrder($order);
             // Attach account info...
+            $customer->setOrderStoreId($order->getStoreId());
             $account = Mage::helper('swisspost_customer')->__toSwissPost($customer, $mapping = 'order_account');
             unset($account['active']);
-            unset($account['account_lang']);
             $sale_order->account = $account;
         }
         // Check connection

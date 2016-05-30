@@ -240,4 +240,23 @@ class Epoint_SwissPost_Api_Helper_Customer extends Mage_Core_Helper_Abstract
 
         return $helper->call('search_read_account', $options);
     }
+    /**
+     * This allows to check the credit status for one account and amount. 
+     * The logic behind that can vary, but the interface is simple: only an account reference and a requested amount are supplied, 
+     * and the response can be:
+     *
+     * @see http://post-ecommerce-xml.braintec-group.com/doc/Swisspost-WS-v2-doc/account.html#check-customer-credit
+     *
+     * @param int $account_ref
+     * @param float $amount
+     * 
+     *
+     * @return mixed
+     */
+    public function checkCustomerCredit($account_ref, $amount)
+    {   
+        $options = array('account_ref'=>$account_ref, 'amount'=>(float)$amount);
+        $helper = Mage::helper('swisspost_api/Api');
+        return $helper->call('check_customer_credit', $options);
+    }
 }

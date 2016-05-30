@@ -12,16 +12,16 @@ class Epoint_SwissPostSales_Helper_Shipping extends Mage_Core_Helper_Abstract
 
     /**
      * Get shipping method for order, from a product
-     *
+     * @string code
      * @return object|null
      */
-    public static function getShippingMethodProduct()
+    public static function getShippingMethodProduct($code)
     {
-        $configureSku = Mage::getStoreConfig(self::XML_CONFIG_PATH_SHIPPING_DEFAULT);
-        if ($configureSku) {
-            return Mage::helper('swisspost_api')->loadProductBySku($configureSku);
+        $code = 'postshipping_pac-eco';
+        $configuredSku = self::getSKUFromShippingCode($code);
+        if ($configuredSku) {
+            return Mage::helper('swisspost_api')->loadProductBySku($configuredSku);
         }
-
         return null;
     }
 
@@ -34,7 +34,8 @@ class Epoint_SwissPostSales_Helper_Shipping extends Mage_Core_Helper_Abstract
      */
     public static function __toSwisspostShippingLine($order)
     {
-        $product = self::getShippingMethodProduct();
+        $code = strtolower($order->getShippingMethod());
+        $product = self::getShippingMethodProduct($code);
         if ($product) {
             $line = array(
                 'product'    => $product->getSku(),
@@ -52,7 +53,6 @@ class Epoint_SwissPostSales_Helper_Shipping extends Mage_Core_Helper_Abstract
                     'line'    => $line,
                 )
             );
-
             return (array)$line;
         }
     }
@@ -76,8 +76,25 @@ class Epoint_SwissPostSales_Helper_Shipping extends Mage_Core_Helper_Abstract
                 $skus[] = $sku;
             }
         }
-
         return $skus;
+    }
+    /**
+     * Get all shipping sku
+     *
+     * @return array
+     */
+    public static  function getSKUFromShippingCode($code)
+    {
+        $lookup_sku = Mage::getStoreConfig(self::XML_CONFIG_PATH_SHIPPING_DEFAULT);
+        // Magento sku|magento shipping method
+        $mapping = Mage::helper('swisspost_api')->extractDefaultValues(self::XML_CONFIG_PATH_SHIPPING_MAPPING);
+        foreach ($mapping as $sku => $magento_shipping_code) {
+            if (strtolower($magento_shipping_code) == $code) {
+                $lookup_sku = $sku;
+                break;
+            }
+        }
+        return $lookup_sku;
     }
 
     /**

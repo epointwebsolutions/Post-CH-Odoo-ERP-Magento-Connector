@@ -12,6 +12,14 @@ class Epoint_SwissPostDebug_Adminhtml_Sales_Order_SendapiController extends Mage
 
         $order = $this->_initOrder();
         try {
+           /**
+            * Convert to invoice
+            */
+            if (Mage::getStoreConfig(Epoint_SwissPostSales_Helper_Order::ENABLE_CONVERT_ORDER_TO_INVOICE_AUTOMATICALLY_CONFIG_PATH)) {
+              if($order->canInvoice()){
+                  Mage::helper('swisspostsales/Order')->__toInvoice($order);
+              }
+            }
             $result = Mage::helper('swisspost_api/Order')->createSaleOrder($order);
             if ($order->getData('odoo_id') > 0 && $order->getData('odoo_id') == $result->getResult('odoo_id')) {
                 $this->_getSession()->addSuccess(Mage::helper('core')->__('The order has been sent to API.'));

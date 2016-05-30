@@ -10,6 +10,11 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
      * Setting path for mapping fields, default values
      */
     const XML_CONFIG_PATH_DEFAULT_VALUES = 'swisspost_api/order/default_values';
+    /**
+     * Comment prefix
+     *
+     */
+    const XML_CONFIG_PATH_DEFAULT_COMMENT_PREFIX = 'swisspost_api/order/comment_prefix';
 
     const XML_CONFIG_PATH_PAYMENT_MAPPING = 'swisspost_api/order_payment_method/mapping';
 
@@ -20,6 +25,18 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
     const XML_CONFIG_PATH_SHIPPING_DEFAULT = 'swisspost_api/order_shipping_method/default';
 
     const XML_CONFIG_PATH_DISCOUNT_SKU_MAPPING = 'swisspost_api/discount/mapping2product';
+
+    const XML_CONFIG_PATH_NOTIFY_FAILURE_EMAILS = 'swisspost_api/notification/failure_emails';
+
+    const XML_CONFIG_PATH_NOTIFY_SUCCESS_EMAILS = 'swisspost_api/notification/success_emails';
+
+    const XML_CONFIG_PATH_FROM_AUTOINCREMENT = 'swisspost_api/order/from_autoincrement';
+
+    const XML_CONFIG_PATH_CRON_LIMIT = 'swisspost_api/order/cron_limit';
+
+    const ENABLE_CONVERT_ORDER_TO_INVOICE_AUTOMATICALLY_CONFIG_PATH = 'swisspost_api/invoice/enable_invoice_automatically';
+    const ENABLE_CONVERT_ORDER_TO_INVOICE_PAYMENT_CODES_CONFIG_PATH = 'swisspost_api/invoice/automaticaly_invoice_by_payment_codes';
+
 
     /**
      * Get all discounts sku
@@ -73,6 +90,7 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
      */
     public function __toSwissPost(Mage_Sales_Model_Order $order)
     {
+        $sale_order_values['note'] = '';
         $mapping = Mage::helper('swisspost_api')->getMapping('order');
         $sale_order_values = Mage::helper('swisspost_api')->__toSwissPost($order, $mapping);
         // Attach default values
@@ -108,11 +126,13 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
             $sale_order_values['note'] = $order->getCustomerNote();
         } else {
             $comments = $order->getAllStatusHistory();
-
             foreach ($comments as $comment) {
-                if (trim($comment->getData('comment'))) {
-                    $sale_order_values['note'] = trim($comment->getData('comment'));
-                    break;
+                if ($comment->getData('entity_name') != 'admin_comment') {
+                    continue;
+                }
+                $text = $comment->getData('comment');
+                if (trim($text)) {
+                    $sale_order_values['note'] = trim($text);
                 }
             }
         }
@@ -143,5 +163,97 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
         }
 
         return $rules;
+    }
+
+    /**
+     * generate invoice from an order
+     *
+     * @param Mage_Sales_Model_Order $order
+     *
+     * @return boolean
+     */
+    public static function __toInvoice(Mage_Sales_Model_Order $order)
+    {
+        try {
+            if ($order->canInvoice()) {
+
+                $invoice = $order->prepareInvoice();
+                $invoice->register();
+                Mage::getModel('core/resource_transaction')
+                    ->addObject($invoice)
+                    ->addObject($invoice->getOrder())
+                    ->save();
+
+                $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true);
+                $order->save();
+                self::addComment($order, 'The invoice has been create from SiwssPost Module');
+
+                return true;
+            }
+        } catch (Exception $e) {
+            Mage::logException($e);
+        }
+
+        return false;
+    }
+
+    /**
+     * Add Comment
+     */
+    public static function addComment(Mage_Sales_Model_Order $order, $comment = '')
+    {
+        $prefix = Mage::getStoreConfig(self::XML_CONFIG_PATH_DEFAULT_COMMENT_PREFIX);
+        if ($prefix) {
+            $comment = $prefix . "\n" . $comment;
+        }
+        $order->addStatusHistoryComment($comment)
+            ->setIsVisibleOnFront(false)
+            ->setIsCustomerNotified(false);
+        $order->save();
+    }
+
+
+    /**
+     * Notify email
+     *
+     * @param      $message
+     * @param null $logLevel
+     */
+    public static function Notify($subject, $message, $error = true)
+    {
+        if ($error) {
+            $emails = explode(',', Mage::getStoreConfig(self::XML_CONFIG_PATH_NOTIFY_FAILURE_EMAILS));
+        } else {
+            $emails = explode(',', Mage::getStoreConfig(self::XML_CONFIG_PATH_NOTIFY_SUCCESS_EMAILS));
+        }
+        if ($emails) {
+            foreach ($emails as $email) {
+                Mage::helper('swisspost_api/MailLog')->sendmail($email, $subject, $message);
+            }
+        }
+    }
+
+    /**
+     * Check if order can be send
+     *
+     * @param Mage_Sales_Model_Order $order
+     *
+     * @return unknown
+     */
+    public static function canSend(Mage_Sales_Model_Order $order)
+    {
+        // Has bee sent already
+        if (Epoint_SwissPostSales_Helper_Data::OrderHasBeenProcessed($order)) {
+            return false;
+        }
+        // Autoincrement limit
+        if ($order->getIncrementId() <= (int)Mage::getStoreConfig(
+                Epoint_SwissPostSales_Helper_Order::XML_CONFIG_PATH_FROM_AUTOINCREMENT
+            )
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }

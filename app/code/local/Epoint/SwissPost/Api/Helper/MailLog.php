@@ -38,10 +38,8 @@ class Epoint_SwissPost_Api_Helper_MailLog extends Mage_Core_Helper_Abstract
             $mail_message = ob_get_clean();
             foreach ($emails as $email) {
                 self::sendmail(
-                    $email, 'Epoint SwissPost API message', $mail_message,
-                    Mage::getStoreConfig('trans_email/ident_general/email'),
-                    Mage::getStoreConfig('trans_email/ident_general/name')
-                );
+                    $email, 'Epoint SwissPost API message', $mail_message
+                    );
             }
         }
     }
@@ -91,10 +89,15 @@ class Epoint_SwissPost_Api_Helper_MailLog extends Mage_Core_Helper_Abstract
      *
      * @return bool
      */
-    public function sendmail($toEmail, $subject, $body, $fromEmail, $fromName)
+    public static function sendmail($toEmail, $subject, $body, $fromEmail = '', $fromName = '')
     {
         try {
-
+            if(!$fromEmail){
+              $fromEmail = Mage::getStoreConfig('trans_email/ident_general/email');
+            }
+            if(!$fromName){
+              $fromName = Mage::getStoreConfig('trans_email/ident_general/name');
+            }
             $mail = new Zend_Mail('UTF-8');
             $mail->addTo($toEmail)
                 ->setFrom($fromEmail, $fromName)

@@ -174,13 +174,19 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
         // Apply mapping, from magento attribute code,
         $product_values = Mage::helper('swisspost_api')->__fromSwissPost($values, $mapping, $checkIfSet = true);
         foreach ($dynamic_values as $attribute_code => $value) {
-            $product_values[$attribute_code] = $value;
+        	$attribute_code = trim($attribute_code);
+        	if($attribute_code && Epoint_SwissPost_Api_Helper_Data::attributeEavExists($attribute_code)){
+        		$product_values[$attribute_code] = $value;	
+        	}else{
+        		Mage::helper('swisspost_api')->log('Invalid product attribute code configured:'.$attribute_code, Zend_Log::ERR);
+        	}
+            
         }
         $updates = array();
         foreach ($product_values as $attributeCode => $value) {
-            if ($product->getData($attributeCode) != $value) {
-                $updates[$attributeCode] = $value;
-            }
+	        if ($product->getData($attributeCode) != $value) {
+	            $updates[$attributeCode] = $value;
+	        }
         }
         // Exists diffs
         if ($updates) {
@@ -262,8 +268,7 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
 
             if ($linkData) {
                 $product->setRelatedLinkData($linkData);
-                Mage::helper('swisspost_api')->log("Related products:");
-                Mage::helper('swisspost_api')->log($prod_id);
+                Mage::helper('swisspost_api')->log("Related products:".$prod_id);
             }
         }
 

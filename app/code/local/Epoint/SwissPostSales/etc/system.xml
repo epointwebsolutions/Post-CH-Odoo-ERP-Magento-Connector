@@ -8,7 +8,7 @@
             <show_in_store>o</show_in_store>
             <groups>
                 <order translate="label comment" module="swisspostsales">
-                    <label>Order setttings</label>
+                    <label>Order settings</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>1234</sort_order>
                     <show_in_default>1</show_in_default>
@@ -25,6 +25,23 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <comment>If is enabled the order will be send over the cron</comment>
                         </enable_cron>
+                        <from_autoincrement translate="label">
+                            <label>Autoincrement order greatest than</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Only orders with autoincroment greatest than will be sent</comment>
+                        </from_autoincrement>
+                        <cron_limit translate="label">
+                            <label>Processed orders on cron execution</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </cron_limit>
                         <enable_realtime translate="label">
                             <label>Send order on creation</label>
                             <frontend_type>select</frontend_type>
@@ -44,6 +61,15 @@
                             <show_in_store>0</show_in_store>
                             <comment>Format: odoo_field_name|default_value, one entry per line</comment>
                         </default_values>
+                        <comment_prefix translate="label">
+                            <label>Comments prefix</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Add a text comment on the comment, to know the owner, used also to not send the comment on Odoo</comment>
+                        </comment_prefix>      
                     </fields>
                 </order>
                 <order_payment_method translate="label comment" module="swisspostsales">
@@ -98,10 +124,10 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment>Format: magento_shipping_code|odoo_shipping_code, one entry per line.</comment>
+                            <comment>Format: magento shipping method code|odoo shipping code, one entry per line.</comment>
                         </mapping>
                         <default_shipping_sku translate="label">
-                            <label>Shipping product sku, added on order</label>
+                            <label>Default shipping order line product sku</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
@@ -110,13 +136,13 @@
                             <comment>Shipping product that will be added on products line from order.</comment>
                         </default_shipping_sku>
                         <mapping2products translate="label">
-                            <label>Shipping product to shipping mapping values</label>
+                            <label>Shipping order line product sku to shipping method codes</label>
                             <frontend_type>textarea</frontend_type>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment>Format: magento product sku| magento shipping method.</comment>
+                            <comment>Format: magento product sku| magento shipping method code.</comment>
                         </mapping2products>
                     </fields>
                 </order_shipping_method>
@@ -141,6 +167,64 @@
                         </mapping2products>
                     </fields>
                 </discount>
+                
+                <notification translate="label comment" module="swisspostsales">
+                    <label>Order notifications</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>2234</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <success_emails translate="label">
+                            <label>Notify email on success</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Comma separated, multiple emails</comment>
+                        </success_emails>
+                        <failure_emails translate="label">
+                            <label>Notify email on failure</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Comma separated, multiple emails</comment>
+                        </failure_emails>
+                    </fields>
+                </notification>
+                <invoice translate="label comment" module="swisspostsales">
+                    <label>Invoice configuration</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>2235</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <enable_invoice_automatically translate="label">
+                            <label>Convert order to invoice automatically</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <comment>If is enabled the order will be invoiced after creation</comment>
+                        </enable_invoice_automatically>
+                        <automaticaly_invoice_by_payment_codes translate="label">
+                            <label>Payments method codes</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>For all the methods, just add *, many entries comma separated.</comment>
+                        </automaticaly_invoice_by_payment_codes>
+                    </fields>
+                </invoice>
             </groups>
         </swisspost_api>
     </sections>
