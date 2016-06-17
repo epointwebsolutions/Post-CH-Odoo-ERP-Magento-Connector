@@ -34,9 +34,13 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
 
     const XML_CONFIG_PATH_CRON_LIMIT = 'swisspost_api/order/cron_limit';
 
+    
     const ENABLE_CONVERT_ORDER_TO_INVOICE_AUTOMATICALLY_CONFIG_PATH = 'swisspost_api/invoice/enable_invoice_automatically';
     const ENABLE_CONVERT_ORDER_TO_INVOICE_PAYMENT_CODES_CONFIG_PATH = 'swisspost_api/invoice/automaticaly_invoice_by_payment_codes';
 
+    const ENABLE_USE_API_PDF_INVOICE_CONFIG_PATH = 'swisspost_api/invoice/enable_invoice_print';
+    
+    const ENABLE_SEND_ORDER_CONFIG_PATH = 'swisspost_api/order/enable_cron';
 
     /**
      * Get all discounts sku
@@ -93,6 +97,12 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
         $sale_order_values['note'] = '';
         $mapping = Mage::helper('swisspost_api')->getMapping('order');
         $sale_order_values = Mage::helper('swisspost_api')->__toSwissPost($order, $mapping);
+        // Special case
+        if(isset($mapping['order_ref']) && $mapping['order_ref'] == 'increment_id'){
+       		$sale_order_values['order_ref'] = $order->getIncrementId();
+        }
+        // Add transaction id
+       	$sale_order_values['transaction_id'] = $order->getPayment()->getLastTransId();
         // Attach default values
         $default_values = Mage::helper('swisspost_api')->extractDefaultValues(self::XML_CONFIG_PATH_DEFAULT_VALUES);
         foreach ($default_values as $key => $value) {
@@ -141,6 +151,42 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Implement methods that return order from a order ref
+     *
+     * @param  string $order_ref
+     *
+     * @return $order Mage_Sales_Model_Order or null
+     */
+    public function __fromOrderRef($order_ref)
+    {
+        $mapping = Mage::helper('swisspost_api')->getMapping('order');
+        $order = null;
+        
+        switch ($mapping['order_ref']){
+          case 'increment_id':
+               $order = Mage::getModel('sales/order')->load($order_ref, 'increment_id');
+            break;          
+            case 'entity_id':
+               $order = Mage::getModel('sales/order')->load($order_ref);
+            break;
+        }
+        return $order;
+    }
+    /**
+     * Implement methods that return order_ref from an ordeer
+     *
+     * @param  Mage_Sales_Model_Order $order
+     *
+     * @return string $order_ref
+     */
+    public function __toOrderRef(Mage_Sales_Model_Order $order)
+    {
+        $mapping = Mage::helper('swisspost_api')->getMapping('order');
+        $sale_order_values = Mage::helper('swisspost_api')->__toSwissPost($order, $mapping);
+        return $sale_order_values['order_ref'];
+       
+    }
+    /**
      * Get discounts order rule, corresponding to SiwssPost rules
      *
      * @param $item
@@ -179,15 +225,18 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
 
                 $invoice = $order->prepareInvoice();
                 $invoice->register();
+                // $invoice->getOrder()->setIsInProcess(true);
+                // Options: STATE_OPEN / STATE_PAID / STATE_CANCELED
+                $invoice->setState(Mage_Sales_Model_Order_Invoice::STATE_OPEN);
+                //$invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_ONLINE);            
+                //$invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_OFFLINE);
                 Mage::getModel('core/resource_transaction')
                     ->addObject($invoice)
                     ->addObject($invoice->getOrder())
                     ->save();
-
-                $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true);
-                $order->save();
-                self::addComment($order, 'The invoice has been create from SiwssPost Module');
-
+                // $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true);
+                // $order->save();
+                self::addComment($order, Mage::helper('core')->__('The invoice has been create from Epoint SiwssPost'));
                 return true;
             }
         } catch (Exception $e) {
@@ -256,4 +305,195 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
 
         return true;
     }
+    /**
+     * get pdf object for the
+     *
+     * @param invoice $invoice
+     */
+    public function getPdf(Mage_Sales_Model_Order_Invoice $invoice){
+    	$pdf = null;
+        $order = $invoice->getOrder();
+        $sales_order_values = Mage::helper('swisspostsales/Order')->__toSwissPost($order);
+        $result = Mage::helper('swisspost_api/Order')->getInvoiceDocs($sales_order_values['order_ref']);
+        $documents = $result->getResult('values');
+        foreach ($documents as $document){
+        	$content = base64_decode($document['content']);
+        	if($content){
+          		$pdf = Zend_Pdf::parse($content);
+          		return $pdf;
+        	}
+		}
+	    return $pdf;
+    }
+    /**
+     * Check if can invoice an order
+     *
+     */
+    public function canInvoice($order){
+      if($order->canInvoice()){
+        if (Mage::getStoreConfig(
+            Epoint_SwissPostSales_Helper_Order::ENABLE_CONVERT_ORDER_TO_INVOICE_AUTOMATICALLY_CONFIG_PATH
+        )) {
+            // Check config, only if the order payment method is allowed to be converted to invoice.
+            $codes = explode(",", strtolower(Mage::getStoreConfig(
+                Epoint_SwissPostSales_Helper_Order::ENABLE_CONVERT_ORDER_TO_INVOICE_PAYMENT_CODES_CONFIG_PATH
+            )));
+            $order_payment_code = strtolower($order->getPayment()->getMethodInstance()->getCode());
+            foreach ($codes as $code){
+              if($code == '*' || $code == $order_payment_code){
+               return true;
+              }
+            }
+        }
+      }
+      return false;
+    }
+    /**
+     * Set invoice status to payment
+     * 
+     * @param Mage_Sales_Model_Order $order
+     * @param array $status
+     */
+    public function processPaymentStatus(Mage_Sales_Model_Order $order, $status){
+      if($status['state']){
+        switch ($status['state']){
+          case 'paid':
+            // create invoice it was not created...
+            if(Mage::helper('swisspostsales/Order')->canInvoice($order)){
+              Mage::helper('swisspostsales/Order')->__toInvoice($order);
+            }
+            // Change invoice status to PAID if it is opened
+            $invoice = $order->getInvoiceCollection()
+              ->addAttributeToSort('created_at', 'DSC')
+              ->setPage(1, 1)
+              ->getFirstItem();
+            // Set paid  
+            if($invoice->getState() == Mage_Sales_Model_Order_Invoice::STATE_OPEN){
+              $invoice->setState(Mage_Sales_Model_Order_Invoice::STATE_PAID);
+              $invoice->save();
+            }
+         }
+      }
+    }
+    
+    /**
+     * Handle API process status
+     *
+     * @param Mage_Sales_Model_Order $order
+     * @param array $status
+     */
+    public function processTransferStatus(Mage_Sales_Model_Order $order, $status){
+      if($status['state']){
+      	  switch ($status['state']){
+      	    case 'done':
+              // create invoice it was not created...
+              if($this->canInvoice($order)){
+                $this->__toInvoice($order);
+              }
+              // Change invoice status to PAID if it is opened
+              $shipment = $order->getShipmentsCollection()
+                ->addAttributeToSort('created_at', 'DSC')
+                ->setPage(1, 1)
+                ->getFirstItem();
+              // Set shipment 
+              if(!$shipment->getId()){
+                $shipment = $this->__toShipment($order);
+              }
+              // attach tracking info
+              if($shipment && $shipment->getId()){
+                Mage::helper('swisspostsales/Shipment')->setTrackingNumber($order, $shipment, $status);
+              }
+              break;
+          }
+      }
+    }
+    
+    /**
+     * Create shipment, 
+     *
+     * @param Mage_Sales_Model_Order $order
+     */
+    public function __toShipment(Mage_Sales_Model_Order $order, $trackingInfo){
+      $shipment = null;
+      try {
+        // Create Qty array
+        $shipmentItems = array();
+        foreach ($order->getAllItems() as $item) {
+          $shipmentItems [$item->getId()] = $item->getQtyToShip();
+        }
+        // Prepear shipment and save ....
+        if ($order->getId() && !empty($shipmentItems) && $order->canShip()) {
+          $shipment = Mage::getModel('sales/service_order', $order)->prepareShipment($shipmentItems);
+          $shipment->save();
+        }
+      }catch (Exception $e){
+         Mage::helper('swisspost_api')->LogException($e);
+         Mage::helper('swisspost_api')->log(
+                      Mage::helper('core')->__('Error on create shipment to order: %s, odoo id: %s', 
+                      $order->getId(), 
+                      $order->getData(Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID)
+                     )
+                 );
+      }
+      return $shipment;
+  }
+  /**
+   * Check if an order is connected
+   *
+   * @param Mage_Sales_Model_Order $order
+   * @return boolean
+   */
+  public static function isConnected(Mage_Sales_Model_Order $order){
+    if($order->getData(Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID)){
+      return true;
+    }
+    return false;
+  }
+  /**
+   * Check if an order is completed
+   *
+   * @param Mage_Sales_Model_Order $order
+   */
+  public static function isCompleted(Mage_Sales_Model_Order $order){
+     // Change invoice status to PAID if it is opened
+     $invoices = $order->getInvoiceCollection();
+     $paid = false;
+     $shipped = false;
+     foreach ($invoices as $invoice){
+       if($invoice->getState() == Mage_Sales_Model_Order_Invoice::STATE_PAID){
+         $paid = true;
+         break;
+       }
+     }
+     if($paid){
+       // Exists one shipment?
+       $shipments = $order->getShipmentsCollection();
+       foreach ($shipments as $shipment){
+         $shipped = true;
+         break;
+       }
+       if($shipped){
+         return true;
+       }
+     }
+     return false;
+  }
+  
+  /**
+   * Check if an order is completed
+   *
+   * @param Mage_Sales_Model_Order $order
+   */
+  public static function __toCompleted(Mage_Sales_Model_Order $order){
+    if($order->getStatus() != Mage_Sales_Model_Order::STATE_COMPLETE){
+        $order->setData('state', Mage_Sales_Model_Order::STATE_COMPLETE);
+        $order->setStatus(Mage_Sales_Model_Order::STATE_COMPLETE);
+        $order->save();
+        // Add comment    
+        Mage::helper('swisspostsales/Order')->addComment(
+              $order,
+              Mage::helper('core')->__('Set order status completed')
+          );
+    }
+  }
 }

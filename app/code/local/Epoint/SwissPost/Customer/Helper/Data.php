@@ -103,10 +103,10 @@ class Epoint_SwissPost_Customer_Helper_Data extends Mage_Core_Helper_Abstract
                 if ($address->getData('concordat_number')) {
                     $account_values['account_function'] = $address->getData('concordat_number');
                 }
-            }
+            }/*
             if (!isset($account_values['account_mobile'])) {
                 $account_values['account_mobile'] = $address->getTelephone();
-            }
+            }*/
             if (!isset($account_values['account_fax'])) {
                 $account_values['account_fax'] = $address->getFax();
             }
@@ -212,9 +212,6 @@ class Epoint_SwissPost_Customer_Helper_Data extends Mage_Core_Helper_Abstract
         }
         if (!($account_values['account_phone'])) {
             $account_values['account_phone'] = $address->getTelephone();
-        }
-        if (!($account_values['account_mobile'])) {
-            $account_values['account_mobile'] = $address->getTelephone();
         }
         if (!($account_values['account_fax'])) {
             $account_values['account_fax'] = $address->getFax();

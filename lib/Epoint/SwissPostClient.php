@@ -127,7 +127,7 @@ class Epoint_SwissPostClient
         $result_data = $this->__callService($method_url, $data);
         // Return result object.
         $debug = $this->debug[sizeof($this->debug) - 1];
-
+    	
         return new SwissPostResult($result_data, $debug);
     }
 
@@ -180,13 +180,8 @@ class Epoint_SwissPostClient
             $cookie = $this->cookie_file_path;
             //$url = 'http://odoo.dev.enode.ro/api.debug.php';
             $this->curlResource = curl_init();
-            file_put_contents(sys_get_temp_dir() . '/request.txt', '');
-            $f = file_put_contents(sys_get_temp_dir() . '/request.txt', '');
-            if ($f) {
-                curl_setopt($this->curlResource, CURLOPT_VERBOSE, true);
-                curl_setopt($this->curlResource, CURLOPT_STDERR, $f);
-            }
             curl_setopt($this->curlResource, CURLOPT_POST, 1);
+            curl_setopt($this->curlResource, CURLOPT_CONNECTTIMEOUT, 15);
             curl_setopt($this->curlResource, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($this->curlResource, CURLOPT_FOLLOWLOCATION, 1);
             curl_setopt($this->curlResource, CURLOPT_ENCODING, 1);
@@ -209,6 +204,12 @@ class Epoint_SwissPostClient
      */
     public function curl($url, $args = array())
     {
+    	// init the debug.
+    	$debug = array(
+    		'url'=>$url,
+    		'error_no' => -1
+    	);
+    	// Call.
         try {
             $data = json_encode($args);
             $this->curlResource = $this->getCurlResource();
@@ -221,13 +222,15 @@ class Epoint_SwissPostClient
             curl_setopt($this->curlResource, CURLOPT_HTTPHEADER, $headers);
             $result = curl_exec($this->curlResource);
             $information = curl_getinfo($this->curlResource);
-            $this->debug[] = array(
+            
+            $debug = array(
                 'url'    => $url,
                 'data'   => print_r(json_decode($data, true), 1),
                 'result' => $result,
             );
 
             if ($result === false) {
+            	$debug['error_no'] = curl_errno($this->curlResource);
                 throw new Exception(
                     sprintf(
                         "cURL error, no %s, error: %s, info: %s", curl_errno($this->curlResource),
@@ -235,14 +238,16 @@ class Epoint_SwissPostClient
                     )
                 );
             }
-
+            $this->debug[] = $debug;
             return $result;
         } catch (Exception $e) {
             if ($this->exceptionLogger) {
                 $this->exceptionLogger->logException($e);
             }
+            $debug['error_no'] = curl_errno($this->curlResource);
         }
-
+        // attach debug.
+		$this->debug[] = $debug;	
         return false;
     }
 
@@ -311,7 +316,6 @@ class Epoint_SwissPostClient
             if ($this->Logger) {
                 $this->Logger->log('Error authenticate to SwissPost API: %s', $result['error']);
             }
-
             return false;
         }
         $data = $this->getResult($result);
@@ -394,7 +398,7 @@ class SwissPostResult extends Varien_Object implements ApiResult
     private $error = array();
     private $debug = array();
     private $isOK = false;
-
+	const CURL_TIMEOUT_ERROR_CODE = 22;
     /**
      * Constructor
      *
@@ -412,11 +416,14 @@ class SwissPostResult extends Varien_Object implements ApiResult
                     $this->isOK = true;
                 }
             }
-        } elseif (isset($result['error'])) {
-            $this->error[] = $result['error'];
-
-        } else {
-            $this->error[] = 'Invalid result data:' . json_encode($result);
+        } 
+        // get error
+        if(!$this->isOK){
+	        if (isset($result['result']['comment'])) {
+	            $this->error[] = $result['result']['comment'];
+	        } else {
+	            $this->error[] = 'Invalid result data:' . json_encode($result);
+	        }
         }
         // Add debug message.
         $this->debug = $debug;
@@ -487,6 +494,28 @@ class SwissPostResult extends Varien_Object implements ApiResult
     {
         return $this->debug;
     }
+	/**
+	 * Check if the result is timeout
+	 *
+	 * @return array
+	 */
+    public function isTimeout(){
+    	if($this->debug['error_no'] && $this->debug['error_no'] == self::CURL_TIMEOUT_ERROR_CODE){
+    		return TRUE;
+    	}
+    	return false;
+    }
+	/**
+	 * Check if the result is timeout
+	 *
+	 * @return array
+	 */
+    public function isValidAPIError(){
+    	if( strtolower($this->result['status']) != 'ok' ){
+    		return TRUE;
+    	}
+    	return false;
+    }
 }
 
 /**
@@ -502,4 +531,8 @@ interface ApiResult
     function getResult();
 
     function isOK();
+    
+    function isValidApiError();
+    
+    function isTimeout();
 }

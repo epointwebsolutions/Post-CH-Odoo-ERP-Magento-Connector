@@ -104,9 +104,7 @@ class Epoint_SwissPost_Customer_Helper_Address extends Mage_Core_Helper_Abstract
         if (!isset($address_values['address_phone'])) {
             $address_values['address_phone'] = $customerAddress->getTelephone();
         }
-        if (!isset($address_values['address_mobile'])) {
-            $address_values['address_mobile'] = $customerAddress->getTelephone();
-        }
+      
         if (!isset($address_values['address_fax'])) {
             $address_values['address_fax'] = $customerAddress->getFax();
         }

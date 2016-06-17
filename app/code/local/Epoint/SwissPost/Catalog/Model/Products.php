@@ -214,7 +214,6 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
                 Mage::getStoreConfig(Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_PATH_STORE_ATTRIBUTE_MAPPING)
             );
         }
-
         if (!$mapping) {
             return;
         }
@@ -233,10 +232,13 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
         $values = $item[self::ODOO_PRODUCT_LANGUAGE_ATTRIBUTE_CODE];
         foreach ($mapping as $magento_store_code => $odoo_language_code) {
             $dynamic_attributes = Mage::helper('swisspost_catalog')->__fromDynamicAttributes($item);
+            
             $dynamic_values = array();
             foreach ($dynamic_attributes as $mage_attribute_code => $info) {
                 if (isset($info['languages'])) {
                     $dynamic_values[$mage_attribute_code] = $info['languages'][$odoo_language_code];
+                }else{
+                	$dynamic_values[$mage_attribute_code] =  $info['value'];
                 }
             }
             $this->saveStoreAttributes($product, $values[$odoo_language_code], $magento_store_code, $dynamic_values);

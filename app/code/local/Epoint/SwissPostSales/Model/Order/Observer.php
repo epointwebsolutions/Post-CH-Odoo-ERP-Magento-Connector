@@ -12,24 +12,8 @@ class Epoint_SwissPostSales_Model_Order_Observer
     public function afterOrderSave(Varien_Event_Observer $observer)
     {
         $order = $observer->getEvent()->getData('order');
-        /**
-         * Convert to invoice
-         */
-        if($order->canInvoice()){
-          if (Mage::getStoreConfig(
-              Epoint_SwissPostSales_Helper_Order::ENABLE_CONVERT_ORDER_TO_INVOICE_AUTOMATICALLY_CONFIG_PATH
-          )) {
-              // Check config, only if the order payment method is allowed to be converted to invoice.
-              $codes = explode(",", strtolower(Mage::getStoreConfig(
-                  Epoint_SwissPostSales_Helper_Order::ENABLE_CONVERT_ORDER_TO_INVOICE_PAYMENT_CODES_CONFIG_PATH
-              )));
-              $order_payment_code = strtolower($order->getPayment()->getMethodInstance()->getCode());
-              foreach ($codes as $code){
-                if($code == '*' || $code == $order_payment_code){
-                  Mage::helper('swisspostsales/Order')->__toInvoice($order);
-                }
-              }
-          }
+        if(Mage::helper('swisspostsales/Order')->canInvoice($order)){
+          Mage::helper('swisspostsales/Order')->__toInvoice($order);
         }
     }
     /**
@@ -40,7 +24,6 @@ class Epoint_SwissPostSales_Model_Order_Observer
     public function SwissPostApiBeforeCreateOrder(Varien_Event_Observer $observer)
     {
         // Attach products
-
         $order = $observer->getData('order');
         $sale_order = $observer->getData('sale_order');
         $sales_order_values = Mage::helper('swisspostsales/Order')->__toSwissPost($order);
@@ -73,16 +56,25 @@ class Epoint_SwissPostSales_Model_Order_Observer
         $result = $observer->getData('result');
         // Save timestamp
         $now = Mage::getModel('core/date')->timestamp();
+        // Set timestamp for API call
         $order->setData(Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_TIMESTAMP, $now)
-            ->getResource()->saveAttribute(
-                $order, Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_TIMESTAMP
-            );
+	        ->getResource()->saveAttribute(
+	            $order, Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_TIMESTAMP
+	        );
         // Save connection.
         if ($result->getResult('odoo_id')) {
+        	// set stopping oddoo id
             $order->setData(
                 Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID, $result->getResult('odoo_id')
             )
-                ->getResource()->saveAttribute($order, Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID);
+            ->getResource()->saveAttribute($order, Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID);
+            // Set state processing.
+            $order->setData(
+                'state', Mage_Sales_Model_Order::STATE_PROCESSING
+            )
+            ->getResource()->saveAttribute($order, 'state');
+
+            // Add comment    
             Mage::helper('swisspostsales/Order')->addComment(
                 $order,
                 Mage::helper('core')->__('Send order return OK from Odoo with #ID: %s', $result->getResult('odoo_id'))
@@ -101,8 +93,21 @@ class Epoint_SwissPostSales_Model_Order_Observer
                 )
                 , $error = false
             );
-
         } else {
+        	// result is an API error
+        	if($result->isValidAPIError()){
+        		// remain on pending, 
+        		if($order->getState() != Mage_Sales_Model_Order::STATE_PENDING){
+        			$order->setState(Mage_Sales_Model_Order::STATE_PROCESSING);
+        			$order->save();
+        		}
+        	}else{
+        		// Set it on hold
+        		if($order->getState() != Mage_Sales_Model_Order::STATE_HOLDED){
+	            	$order->setState(Mage_Sales_Model_Order::STATE_HOLDED);
+	            	$order->save();
+        		}
+        	}
             // Notify Error
             Mage::helper('swisspostsales/Order')->addComment(
                 $order,
@@ -112,6 +117,7 @@ class Epoint_SwissPostSales_Model_Order_Observer
                     implode("\n", $result->getDebug())
                 )
             );
+            
             Mage::helper('swisspostsales/Order')->Notify(
                 Mage::helper('core')->__('Send order #%s return ERROR', $order->getIncrementId()),
                 Mage::helper('core')->__(
@@ -122,8 +128,62 @@ class Epoint_SwissPostSales_Model_Order_Observer
                 )
                 , $error = true
             );
+            
         }
 
         $observer->setData('order', $order);
+    }
+    
+    /**
+     * Receive payment status returned from the API
+     *
+     * @param Varien_Event_Observer $observer
+     */
+    function SwissPostApiGetPaymentStatus(Varien_Event_Observer $observer){
+      $result = $observer->getData('result');
+      $order_refs = $observer->getData('order_refs');
+      if($result && $result->getValues()){
+        $values = $result->getValues();
+        foreach ($order_refs as $order_ref){
+          foreach ($values as $status){
+            if(stripos($status['order_ref'], $order_ref) !== false){   
+              $order = Mage::helper('swisspostsales/Order')->__fromOrderRef($order_ref);
+              if($order){
+                Mage::helper('swisspostsales/Order')->processPaymentStatus($order, $status);
+                // set final status
+                if(Mage::helper('swisspostsales/Order')->isCompleted($order)){
+                  Mage::helper('swisspostsales/Order')->__toCompleted($order);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    /**
+     * Receive transfer status returned from the API
+     *
+     * @param Varien_Event_Observer $observer
+     */
+    function SwissPostApiGetTransferStatus(Varien_Event_Observer $observer){
+      $result = $observer->getData('result');
+      $order_refs = $observer->getData('order_refs');
+      if($result && $result->getValues()){
+        $values = $result->getValues();
+        foreach ($order_refs as $order_ref){
+          foreach ($values as $status){
+            if(stripos($status['order_ref'], $order_ref) !== false){   
+              $order = Mage::helper('swisspostsales/Order')->__fromOrderRef($order_ref);
+              if($order){
+                Mage::helper('swisspostsales/Order')->processTransferStatus($order, $status);
+                // set final status
+                if(!Mage::helper('swisspostsales/Order')->isCompleted($order)){
+                  Mage::helper('swisspostsales/Order')->__toCompleted($order);
+                }
+              }
+            }
+          }
+        }
+      }
     }
 }

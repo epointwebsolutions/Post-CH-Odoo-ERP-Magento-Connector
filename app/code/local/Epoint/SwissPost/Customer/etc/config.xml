@@ -45,7 +45,6 @@
                 <address_city>city</address_city>
                 <address_country>country</address_country>
                 <address_phone>telephone</address_phone>
-                <address_mobile>telephone</address_mobile>
                 <address_fax>fax</address_fax>
                 <address_street2>department</address_street2>
                 <address_po_box>pobox</address_po_box>

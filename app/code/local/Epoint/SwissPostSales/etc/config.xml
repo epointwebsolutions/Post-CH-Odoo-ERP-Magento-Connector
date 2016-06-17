@@ -15,6 +15,12 @@
             <swisspostsales>
                 <class>Epoint_SwissPostSales_Model</class>
             </swisspostsales>
+            <sales>
+              <rewrite>
+                  <order_pdf_invoice>Epoint_SwissPostSales_Model_Order_Pdf_Invoice</order_pdf_invoice>
+                  <order_pdf_shipment>Epoint_SwissPostSales_Model_Order_Pdf_Shipment</order_pdf_shipment>
+              </rewrite>
+            </sales>              
         </models>
         <resources>
             <swisspostsales_setup>
@@ -52,8 +58,35 @@
                     </customer_swisspost_api_after_create_order_observer>
                 </observers>
             </swisspost_api_after_create_order>
+            <swisspost_api_order_get_transfer_status>
+                <observers>
+                    <swisspost_api_order_get_transfer_status>
+                        <type>singleton</type>
+                        <class>swisspostsales/shipping_observer</class>
+                        <method>SwissPostApiGetTransferStatus</method>
+                    </swisspost_api_order_get_transfer_status>
+                </observers>
+            </swisspost_api_order_get_transfer_status>
+            <swisspost_api_order_get_payment_status>
+                <observers>
+                    <swisspost_api_order_get_payment_status>
+                        <type>singleton</type>
+                        <class>swisspostsales/order_observer</class>
+                        <method>SwissPostApiGetPaymentStatus</method>
+                    </swisspost_api_order_get_payment_status>
+                </observers>
+            </swisspost_api_order_get_payment_status>
         </events>
     </global>
+    <frontend>
+        <layout>
+            <updates>
+                <swisspostsales>
+                    <file>epoint.xml</file>
+                </swisspostsales>
+            </updates>
+        </layout>
+    </frontend>
     <adminhtml>
         <acl>
             <resources>
@@ -96,12 +129,20 @@
                     <model>swisspostsales/Order_Cron::send</model>
                 </run>
             </swisspostsales_send_orders>
-            <swisspostsales_receive_shipping>
+            <swisspostsales_order_get_payment_status>
                 <schedule>
-                    <cron_expr>0 1 * * *</cron_expr>
+                    <cron_expr>3 0,4,8,12,16,20  * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>swisspostsales/Shipping_Cron::update</model>
+                    <model>swisspostsales/Order_Cron::getPaymentStatus</model>
+                </run>
+            </swisspostsales_order_get_payment_status>
+            <swisspostsales_receive_shipping>
+                <schedule>
+                    <cron_expr>3 1,5,9,13,17,21  * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>swisspostsales/Shipping_Cron::getTransferStatus</model>
                 </run>
             </swisspostsales_receive_shipping>
         </jobs>
@@ -112,7 +153,7 @@
     <default>
         <order>
             <swisspost_api>
-                <order_ref>entity_id</order_ref>
+                <order_ref>increment_id</order_ref>
                 <client_order_ref>increment_id</client_order_ref>
                 <date_order>created_at</date_order>
                 <delivery_method>--</delivery_method>

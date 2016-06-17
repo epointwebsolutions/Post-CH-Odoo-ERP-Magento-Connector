@@ -17,7 +17,6 @@ class Epoint_SwissPostSales_Helper_Shipping extends Mage_Core_Helper_Abstract
      */
     public static function getShippingMethodProduct($code)
     {
-        $code = 'postshipping_pac-eco';
         $configuredSku = self::getSKUFromShippingCode($code);
         if ($configuredSku) {
             return Mage::helper('swisspost_api')->loadProductBySku($configuredSku);
@@ -142,7 +141,6 @@ class Epoint_SwissPostSales_Helper_Shipping extends Mage_Core_Helper_Abstract
         }
         if ($method) {
             $methods = self::getMethods();
-
             return $methods[$method];
         }
     }

@@ -61,11 +61,15 @@ class Epoint_SwissPost_Catalog_Model_Cron
     public function getInventory()
     {
         try{
-          $products = Mage::helper('swisspost_api/Product')->getProducts();
+          $products = Mage::helper('swisspost_api/Product')->getProducts(array(
+              'fields'=>array('product_code'),
+            )
+          );
           $product_ids = array();
           foreach ($products as $product) {
               $product_ids[] = $product['product_code'];
           }
+          
           if (!empty($product_ids)) {
               $inventory = Mage::helper('swisspost_api/Product')->getInventory(array('product_codes' => $product_ids))
                   ->getValues();

@@ -118,9 +118,106 @@ class Epoint_SwissPost_Api_Helper_Order extends Mage_Core_Helper_Abstract
     {
         $helper = Mage::helper('swisspost_api/Api');
         foreach ($order_refs as $key => $id) {
-            $order_refs[$key] = " " . "$id";
+            $order_refs[$key] = "". "$id";
         }
-
-        return $helper->call('get_payment_status', array('order_refs' => $order_refs));
+        $result = $helper->call('get_payment_status', array('order_refs' => $order_refs));
+        // Share action
+        Mage::dispatchEvent(
+            'swisspost_api_order_get_payment_status',
+            array(
+                'order_refs' => $order_refs,
+                'result'     => $result
+            )
+        );
+        return $result;
+    }
+    /**
+     * get_invoice_docs
+     * Goal
+     * Return the PDF of the invoice report(s) for a sale order. The server has the choice to return one of:
+     *     the content of the file, encoded in base64
+     *     an URL where it can be downloaded
+     * The client cannot choose between the two, so it must be able to handle the two cases.
+     * In case an URL is returned, care must be taken to have the correct newtork access to the address.
+     * The server could return cancelled documents if that is relevant, but this is not guaranteed. On the other hand, valid invoices are always returned.
+     * Also note that this method will always send existing documents, if they exist. In no situation a call to this method will trigger the generation of a new report.
+     * Request
+     * 
+     * POST /ecommerce_api_v2/get_invoice_docs
+     */
+    public function getInvoiceDocs($order_ref = '')
+    {
+        $helper = Mage::helper('swisspost_api/Api');
+        return $helper->call('get_invoice_docs', array('order_ref' => $order_ref));
+    }
+    /**
+     * get_invoice_docs
+     * Goal
+     * Return the PDF of the invoice report(s) for a sale order. The server has the choice to return one of:
+     *     the content of the file, encoded in base64
+     *     an URL where it can be downloaded
+     * The client cannot choose between the two, so it must be able to handle the two cases.
+     * In case an URL is returned, care must be taken to have the correct newtork access to the address.
+     * The server could return cancelled documents if that is relevant, but this is not guaranteed. On the other hand, valid invoices are always returned.
+     * Also note that this method will always send existing documents, if they exist. In no situation a call to this method will trigger the generation of a new report.
+     * Request
+     * 
+     * POST /ecommerce_api_v2/get_invoice_docs
+     */
+    public function getDeliveryDocs($order_ref = '')
+    {
+        $helper = Mage::helper('swisspost_api/Api');
+        return $helper->call('get_delivery_docs', array('order_ref' => $order_ref));
+    }
+    
+    /**
+     * get_transfer_status
+     * Goal
+     * This call allows to query the overall delivery status of an order.
+     * The result will be exact only for simple cases without partial deliveries.
+     * Otherwise, only the most recent delivery to the customer might be taken into account.
+     * Request
+     * POST /ecommerce_api_v2/get_transfer_status
+     *
+     * @param array $orders_ref
+     * @return object result
+     */
+    public function getTransferStatus($order_refs = array())
+    {
+        $helper = Mage::helper('swisspost_api/Api');
+        foreach ($order_refs as $key => $id) {
+            $order_refs[$key] = "" . "$id";
+        }
+        $result = $helper->call('get_transfer_status', array('order_refs' => $order_refs));
+        // Share action
+        Mage::dispatchEvent(
+            'swisspost_api_order_get_transfer_status',
+            array(
+                'order_refs' => $order_refs,
+                'result'     => $result
+            )
+        );
+        return $result;
+     }
+    /**
+     * get_transfer_details
+     * 
+     * Goal
+     *
+     * This method is similar to get_transfer_status, but it gives detailed information about each delivery. 
+     * In turn, each delivery can be composed of multiple lines (one for every product).
+     *  Specification
+     * 
+     * POST /ecommerce_api_v2/get_transfer_details
+     * @param array $orders_ref
+     * @return object result
+     */
+    public function getTransferDetails($order_refs = array())
+    {
+        $helper = Mage::helper('swisspost_api/Api');
+        foreach ($order_refs as $key => $id) {
+            $order_refs[$key] = "" . "$id";
+        }
+        return $helper->call('get_transfer_status', array('order_refs' => $order_refs));
     }
 }

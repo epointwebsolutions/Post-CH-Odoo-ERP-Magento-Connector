@@ -36,9 +36,9 @@ class Epoint_SwissPost_Customer_Model_Payment_Observer
                 $quoteObj = Mage::getSingleton('checkout/session')->getQuote();
                 // compare diff
                 if(is_object($quoteObj)){
-                  $totals = $quoteObj->getTotals();
-                  // disable it
-                  if($totals > 0 && $limit <= $totals){
+                  $total = $quoteObj->getTotals();
+                  // disable it if total is greatest than limit.
+                  if($total > 0 && $total >= $limit){
                     $result = $observer->getResult();
                     $result->isAvailable = false;
                     return ;
@@ -58,9 +58,9 @@ class Epoint_SwissPost_Customer_Model_Payment_Observer
                 if(is_object($quoteObj)){
                   if($quote->getCustomer()){
                     $connection = Mage::getModel('swisspost_customer/odoo')->loadCustomerConnection($quote->getCustomer());
-                    if($connection->isConnected() && $totals > 0){
-                      $totals = $quoteObj->getTotals();
-                      $response = Mage::helper('swisspost_api/Customer')->checkCustomerCredit($connection->__toAccountRef(), $totals);
+                    $total = $quoteObj->getTotals();
+                    if($connection->isConnected() && $total > 0){
+                      $response = Mage::helper('swisspost_api/Customer')->checkCustomerCredit($connection->__toAccountRef(), $total);
                       // Disable it.
                       if((int)$response->getResult('check_ok') != 1){
                         $result = $observer->getResult();

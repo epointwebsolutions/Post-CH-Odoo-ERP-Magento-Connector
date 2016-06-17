@@ -43,15 +43,13 @@ class Epoint_SwissPostDebug_Model_Observer
     {
         $block = $observer->getEvent()->getBlock();
         if ($block instanceof Mage_Adminhtml_Block_Sales_Order_View) {
-            $order = $observer->getOrder();
+            $order = $observer->getBlock()->getOrder();
             // is connected	?
-            if ($order && is_object($order)
-                && $order->getData(
-                    Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID
-                )
+            if ($order && is_object($order) && $order->getData('increment_id')
+                && Mage::helper('swisspostsales/Order')->isConnected($order)
             ) {
                 $label = Mage::helper('swisspostdebug')->__(
-                    'Export to SwissPost (%s)', Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID
+                    'Reexport to SwissPost (%s)', $order->getData(Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID)
                 );
             } else {
                 $label = Mage::helper('swisspostdebug')->__('Export to SwissPost');
@@ -60,6 +58,28 @@ class Epoint_SwissPostDebug_Model_Observer
                 'sendapi', array(
                     'label'   => $label,
                     'onclick' => "setLocation('{$block->getUrl('*/sales_order_sendapi/order')}')",
+                    'class'   => 'go'
+                )
+            );
+            // get Payment status
+            $label = Mage::helper('swisspostdebug')->__(
+                    'Get SwissPost payment status'
+                );
+            $block->addButton(
+                'get-payment-status', array(
+                    'label'   => $label,
+                    'onclick' => "setLocation('{$block->getUrl('*/sales_order_getstatus/payment')}')",
+                    'class'   => 'go'
+                )
+            );
+            // get Payment status
+            $label = Mage::helper('swisspostdebug')->__(
+                    'Get SwissPost transfer status'
+                );
+            $block->addButton(
+                'get-transport-status', array(
+                    'label'   => $label,
+                    'onclick' => "setLocation('{$block->getUrl('*/sales_order_getstatus/transfer')}')",
                     'class'   => 'go'
                 )
             );

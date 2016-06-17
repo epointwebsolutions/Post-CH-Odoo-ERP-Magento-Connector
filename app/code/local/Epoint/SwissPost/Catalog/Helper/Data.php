@@ -152,6 +152,9 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
                 Mage::getStoreConfig(self::XML_CONFIG_PATH_DINAMYC_ATTRIBUTE_MAPPING)
             );
         }
+        /**
+         * $odoo_values
+         */
         $odoo_values = array();
         if (isset($item['dynamic_attributes'])) {
             foreach ($item['dynamic_attributes'] as $attribute) {
@@ -166,7 +169,6 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
         foreach ($mapping as $odoo_attribute_code => $mage_attribute_code) {
             $values[$mage_attribute_code] = $odoo_values[$odoo_attribute_code];
         }
-
         return $values;
     }
 }
