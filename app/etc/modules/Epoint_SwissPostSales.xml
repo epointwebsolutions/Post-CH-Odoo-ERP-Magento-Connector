@@ -1,0 +1,11 @@
+<config>
+  <modules>
+    <Epoint_SwissPostSales>
+      <active>true</active>
+      <codePool>local</codePool>
+      <depends>
+		<Epoint_SwissPost_Api/>
+      </depends>
+    </Epoint_SwissPostSales>
+  </modules>
+</config>
