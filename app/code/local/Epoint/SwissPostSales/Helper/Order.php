@@ -487,7 +487,7 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
   public static function __toCompleted(Mage_Sales_Model_Order $order){
     if($order->getStatus() != Mage_Sales_Model_Order::STATE_COMPLETE){
         $order->setState('state', Mage_Sales_Model_Order::STATE_COMPLETE, TRUE);
-        $order->setStatus(Mage_Sales_Model_Order::STATE_COMPLETE);
+        $order->setStatus('complete');
         $order->save();
         // Add comment    
         Mage::helper('swisspostsales/Order')->addComment(

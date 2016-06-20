@@ -34,7 +34,7 @@ class Epoint_SwissPostSales_Model_Shipping_Cron
             )
            ->addFieldToFilter(
                 'main_table.status',
-                Mage_Sales_Model_Order::STATE_PROCESSING
+                'processing'
            );
          // Add group    
         $order_collection->getSelect()->group('main_table.entity_id');

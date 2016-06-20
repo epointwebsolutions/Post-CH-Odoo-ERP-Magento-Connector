@@ -96,7 +96,7 @@ class Epoint_SwissPostSales_Model_Order_Observer
         		// remain on pending, 
         		if($order->getState() != Mage_Sales_Model_Order::STATE_PENDING_PAYMENT){
         			$order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, TRUE);
-        			$order->setStatus(Mage_Sales_Model_Order::STATE_PROCESSING);
+        			$order->setStatus('processing');
         			$order->save();
         		}
         	}else{
