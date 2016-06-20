@@ -40,8 +40,6 @@ class Epoint_SwissPostSales_Model_Order_Cron
         $order_collection->getSelect()->group('main_table.entity_id');
         // Add Limit    
         $order_collection->getSelect()->limit((int)Mage::getStoreConfig(Epoint_SwissPostSales_Helper_Order::XML_CONFIG_PATH_CRON_LIMIT));    
-        print $order_collection->getSelect()->__toString();
-        die();
         
         foreach ($order_collection as $order_item) {
             $order = Mage::getModel('sales/order')->load($order_item->getId());
