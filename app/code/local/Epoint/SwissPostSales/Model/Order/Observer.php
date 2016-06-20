@@ -63,17 +63,14 @@ class Epoint_SwissPostSales_Model_Order_Observer
 	        );
         // Save connection.
         if ($result->getResult('odoo_id')) {
-        	// set stopping oddoo id
+        	// set oddoo id
             $order->setData(
                 Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID, $result->getResult('odoo_id')
-            )
-            ->getResource()->saveAttribute($order, Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID);
+            );
             // Set state processing.
-            $order->setData(
-                'state', Mage_Sales_Model_Order::STATE_PROCESSING
-            )
-            ->getResource()->saveAttribute($order, 'state');
-
+            $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, TRUE);
+            $order->save();
+            
             // Add comment    
             Mage::helper('swisspostsales/Order')->addComment(
                 $order,
@@ -97,8 +94,9 @@ class Epoint_SwissPostSales_Model_Order_Observer
         	// result is an API error
         	if($result->isValidAPIError()){
         		// remain on pending, 
-        		if($order->getState() != Mage_Sales_Model_Order::STATE_PENDING){
-        			$order->setState(Mage_Sales_Model_Order::STATE_PROCESSING);
+        		if($order->getState() != Mage_Sales_Model_Order::STATE_PENDING_PAYMENT){
+        			$order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, TRUE);
+        			$order->setStatus(Mage_Sales_Model_Order::STATE_PROCESSING);
         			$order->save();
         		}
         	}else{
@@ -108,8 +106,8 @@ class Epoint_SwissPostSales_Model_Order_Observer
 	            	$order->save();
         		}
         	}
-            // Notify Error
-            Mage::helper('swisspostsales/Order')->addComment(
+          // Notify Error
+          Mage::helper('swisspostsales/Order')->addComment(
                 $order,
                 Mage::helper('core')->__(
                     'Send order return ERROR from Odoo: %s, debug: %s',

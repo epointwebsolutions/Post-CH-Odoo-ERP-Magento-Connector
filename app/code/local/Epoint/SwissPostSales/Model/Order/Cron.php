@@ -28,7 +28,7 @@ class Epoint_SwissPostSales_Model_Order_Cron
             )
             ->addFieldToFilter(
                 'main_table.status',
-                Mage_Sales_Model_Order::STATE_PENDING
+                Mage_Sales_Model_Order::STATE_PENDING_PAYMENT
             )
             ->addAttributeToFilter(
                 'main_table.'.Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID,
