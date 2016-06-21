@@ -44,7 +44,7 @@ class Epoint_SwissPostSales_Model_Order_Cron
         foreach ($order_collection as $order_item) {
             $order = Mage::getModel('sales/order')->load($order_item->getId());
             // check if can be sent again
-            if(Mage::helper('swisspost_api/Order')->isConnected($order)){
+            if(Mage::helper('swisspostsales/Order')->isConnected($order)){
             	 Mage::helper('swisspost_api')->log(
                         Mage::helper('core')->__('Stop sending again order: %s, odoo id: %s', $order->getId(), 
                         $order->getData(Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID)

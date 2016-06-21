@@ -94,18 +94,16 @@ class Epoint_SwissPostSales_Model_Order_Observer
         	// result is an API error
         	if($result->isValidAPIError()){
         		// remain on pending, 
-        		if($order->getState() != Mage_Sales_Model_Order::STATE_PENDING_PAYMENT){
-        			$order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, TRUE);
-        			$order->setStatus('processing');
-        			$order->save();
-        		}
+        		$order->setState(Mage_Sales_Model_Order::STATE_HOLDED);
+            $order->setStatus('holded');
+            $order->save();
         	}else{
         		// Set it on hold
-        		if($order->getState() != Mage_Sales_Model_Order::STATE_HOLDED){
-	            	$order->setState(Mage_Sales_Model_Order::STATE_HOLDED);
-	            	$order->save();
-        		}
+          	$order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, TRUE);
+      			$order->setStatus('processing');
+      			$order->save();
         	}
+        	
           // Notify Error
           Mage::helper('swisspostsales/Order')->addComment(
                 $order,
