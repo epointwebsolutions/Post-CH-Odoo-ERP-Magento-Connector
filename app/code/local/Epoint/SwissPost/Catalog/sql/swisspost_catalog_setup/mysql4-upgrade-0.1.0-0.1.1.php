@@ -3,7 +3,7 @@ $installer = $this;
 $installer->startSetup();
 
 $setup = new Mage_Eav_Model_Entity_Setup('core_setup');
-$installer->startSetup();
+
 $setup->addAttributeGroup('catalog_product', 'Default', 'Odoo Connector', 4);
 
 $setup->addAttribute(
