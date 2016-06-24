@@ -26,7 +26,7 @@
             <swisspostsales_setup>
                 <setup>
                     <module>Epoint_SwissPostSales</module>
-                    <class>Mage_Catalog_Model_Resource_Setup</class>
+                    <class>Mage_Catalog_Model_Resource_Eav_Mysql4_Setup</class>
                 </setup>
             </swisspostsales_setup>
         </resources>
