@@ -3,7 +3,6 @@ $installer = $this;
 $installer->startSetup();
 
 $setup = new Mage_Eav_Model_Entity_Setup('core_setup');
-$installer->startSetup();
 
 $setup->addAttribute(
     'catalog_product', 'supplier_names', array(
