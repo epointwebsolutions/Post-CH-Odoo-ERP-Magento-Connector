@@ -25,15 +25,15 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <comment>If is enabled the order will be send over the cron</comment>
                         </enable_cron>
-                        <from_autoincrement translate="label">
-                            <label>Autoincrement order greatest than</label>
+                       <from_date translate="label">
+                            <label>Sent order with creation date greatest than</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment>Only orders with autoincroment greatest than will be sent</comment>
-                        </from_autoincrement>
+                            <comment>Only orders with date greatest than configured will be sent, format : YYYY-mm-dd</comment>
+                        </from_date>
                         <cron_limit translate="label">
                             <label>Processed orders on cron execution</label>
                             <frontend_type>text</frontend_type>

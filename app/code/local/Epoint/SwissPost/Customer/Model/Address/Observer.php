@@ -18,7 +18,7 @@ class Epoint_SwissPost_Customer_Model_Address_Observer
         if ($billing_address_id) {
             $address = $order->getBillingAddress();
             // Pass values
-            $address_values = Mage::helper('swisspost_customer/address')->__toSwissPost($customer, $address);
+            $address_values = Mage::helper('swisspost_customer/address')->__toSwissPost($customer, $address, $order);
             $address_values['address_ref'] = $billing_address_id;
             $sale_order->address_invoice = $address_values;
         }
@@ -35,7 +35,7 @@ class Epoint_SwissPost_Customer_Model_Address_Observer
             $shipping_address_id = $order->getShippingAddress()->getId();
             if ($shipping_address_id) {
                 $address = $order->getShippingAddress();
-                $address_values = Mage::helper('swisspost_customer/address')->__toSwissPost($customer, $address);
+                $address_values = Mage::helper('swisspost_customer/address')->__toSwissPost($customer, $address, $order);
                 $address_values['address_ref'] = $shipping_address_id;
                 $sale_order->address_shipping = $address_values;
             }

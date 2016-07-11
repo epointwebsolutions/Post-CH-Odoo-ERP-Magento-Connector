@@ -85,12 +85,11 @@ class Epoint_SwissPost_Customer_Model_Customer_Observer
         if ($order->getCustomerIsGuest()) {
             // Attach account info...
             $address = $order->getBillingAddress();
-            $connection = Mage::getModel('swisspost_customer/odoo')->loadByAddress($address);
+           
+            $connection = Mage::getModel('swisspost_customer/odoo')->loadByOrder($order);
             $account = Mage::helper('swisspost_customer')->__toSwissPostFromAddress(
                 $address, $order, $mapping = 'order_account_anonymous'
             );
-            unset($account['active']);
-            $sale_order->account = $account;
         } else {
             $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
             $connection = Mage::getModel('swisspost_customer/odoo')->loadByOrder($order);
@@ -98,8 +97,8 @@ class Epoint_SwissPost_Customer_Model_Customer_Observer
             $customer->setOrderStoreId($order->getStoreId());
             $account = Mage::helper('swisspost_customer')->__toSwissPost($customer, $mapping = 'order_account');
             unset($account['active']);
-            $sale_order->account = $account;
         }
+        $sale_order->account = $account;
         // Check connection
         if (!$connection->isConnected()) {
             if ($order->getCustomerIsGuest()) {
@@ -135,8 +134,8 @@ class Epoint_SwissPost_Customer_Model_Customer_Observer
         if ($result->getResult('odoo_id')) {
             // Diff info
             if ($result->getResult('odoo_id') != $customer->getData($attributeCode)) {
-                $customer->setData($attributeCode, $result->getResult('odoo_id'))
-                    ->getResource()->saveAttribute($customer, $attributeCode);
+              $customer->setData($attributeCode, $result->getResult('odoo_id'));
+              $customer->save();
             }
         }
         // Update connection.
@@ -214,7 +213,7 @@ class Epoint_SwissPost_Customer_Model_Customer_Observer
     public function SwissPostApiBeforeCreateUpdateAnonymousAccount(Varien_Event_Observer $observer)
     {
         // Load data.
-        $order = $observer->getAddress();
+        $order = $observer->getOrder();
         $address = $observer->getAddress();
         $account = $observer->getAccount();
         // Pass values

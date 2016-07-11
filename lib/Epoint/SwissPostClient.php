@@ -511,7 +511,7 @@ class SwissPostResult extends Varien_Object implements ApiResult
 	 * @return array
 	 */
     public function isValidAPIError(){
-    	if( strtolower($this->result['status']) == 'error' ){
+    	if(isset($this->result['status']) && strtolower($this->result['status']) == 'error' ){
     		return TRUE;
     	}
     	return false;

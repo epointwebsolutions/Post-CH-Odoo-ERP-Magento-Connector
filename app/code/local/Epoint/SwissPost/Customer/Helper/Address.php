@@ -20,7 +20,7 @@ class Epoint_SwissPost_Customer_Helper_Address extends Mage_Core_Helper_Abstract
      *
      * @return mixed
      */
-    public function __toSwissPost(Mage_Customer_Model_Customer $customer, Mage_Core_Model_Abstract $customerAddress)
+    public function __toSwissPost(Mage_Customer_Model_Customer $customer, Mage_Core_Model_Abstract $customerAddress, Mage_Core_Model_Abstract $order)
     {
         // Load mapping
         $mapping = Mage::helper('swisspost_api')->getMapping('address');
@@ -52,6 +52,9 @@ class Epoint_SwissPost_Customer_Helper_Address extends Mage_Core_Helper_Abstract
         if (!isset($address_values['address_email'])) {
             $address_values['address_email'] = $customer->getEmail();
         }
+        if (!isset($address_values['address_email'])) {
+            $address_values['address_email'] = $order->getCustomerEmail();
+        }
         if (!isset($address_values['account_address_type'])) {
             $address_values['account_address_type'] = 'default';
             if ($customerAddress->getIsDefaultBilling()) {
@@ -74,6 +77,7 @@ class Epoint_SwissPost_Customer_Helper_Address extends Mage_Core_Helper_Abstract
             }
             $address_values['address_title'] = $addressTitle;
         }
+        $address_values['address_title'] = Mage::helper('swisspost_api')->__toTitle($address_values['address_title']);
         if (!isset($address_values['address_company'])) {
             $address_values['address_company'] = $customerAddress->getCompany();
         }

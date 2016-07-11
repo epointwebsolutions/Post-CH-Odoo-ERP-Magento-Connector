@@ -57,10 +57,7 @@ class Epoint_SwissPostSales_Model_Order_Observer
         // Save timestamp
         $now = Mage::getModel('core/date')->timestamp();
         // Set timestamp for API call
-        $order->setData(Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_TIMESTAMP, $now)
-	        ->getResource()->saveAttribute(
-	            $order, Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_TIMESTAMP
-	        );
+        $order->setData(Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_TIMESTAMP, $now);
         // Save connection.
         if ($result->getResult('odoo_id')) {
         	// set oddoo id

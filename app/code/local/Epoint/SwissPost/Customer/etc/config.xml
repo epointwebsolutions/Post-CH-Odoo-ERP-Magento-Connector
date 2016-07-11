@@ -24,7 +24,7 @@
             <swisspost_api>
                 <account_firstname>firstname</account_firstname>
                 <account_lastname>lastname</account_lastname>
-                <account_email>mail</account_email>
+                <account_email>customer_email</account_email>
                 <account_country>country</account_country>
                 <account_city>city</account_city>
                 <account_function>concordat_number</account_function>
@@ -69,7 +69,7 @@
             <swisspost_api>
                 <account_firstname>firstname</account_firstname>
                 <account_lastname>lastname</account_lastname>
-                <account_email>email</account_email>
+                <account_email>customer_email</account_email>
                 <account_street>street1</account_street>
                 <account_country>country</account_country>
                 <account_city>city</account_city>
@@ -86,6 +86,21 @@
                 <class>Epoint_SwissPost_Customer_Helper</class>
             </swisspost_customer>
         </helpers>
+         <models>
+            <swisspost_customer>
+                <class>Epoint_SwissPost_Customer_Model</class>
+                <resourceModel>swisspost_customer_mysql4</resourceModel>
+            </swisspost_customer>
+            <swisspost_customer_mysql4>
+                <class>Epoint_SwissPost_Customer_Model_Mysql4</class>
+                <entities>
+                    <odoo>
+                        <table>epoint_swisspost_customer_odoo</table>
+                    </odoo>
+                </entities>
+            </swisspost_customer_mysql4>
+        </models>
+      <!--  New magento version over 1.6
         <models>
             <swisspost_customer>
                 <class>Epoint_SwissPost_Customer_Model</class>
@@ -100,12 +115,27 @@
                 </entities>
             </swisspost_customer_resource>
         </models>
+        -->
         <resources>
             <swisspost_customer_setup>
                 <setup>
                     <module>Epoint_SwissPost_Customer</module>
+                    <class>Mage_Catalog_Model_Resource_Eav_Mysql4_Setup</class>
                 </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
             </swisspost_customer_setup>
+            <swisspost_customer_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </swisspost_customer_write>
+            <swisspost_customer_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </swisspost_customer_read>
         </resources>
         <events>
             <!-- observer the events -->

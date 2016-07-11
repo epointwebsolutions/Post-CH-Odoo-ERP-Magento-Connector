@@ -27,8 +27,21 @@
                 <setup>
                     <module>Epoint_SwissPostSales</module>
                     <class>Mage_Catalog_Model_Resource_Eav_Mysql4_Setup</class>
-                </setup>
+                 </setup>   
+                 <connection>
+                    <use>core_setup</use>
+                </connection>
             </swisspostsales_setup>
+            <swisspostsales_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </swisspostsales_write>
+            <swisspostsales_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </swisspostsales_read>
         </resources>
         <events>
             <!-- observe the event -->

@@ -60,6 +60,35 @@
                             <comment>Multiple values commas separated, rormat: odoo_type1,odoo_type2, odoo_type2
                             </comment>
                         </disabled_products_by_type>
+                        <visibility_attribute_code translate="label">
+                            <label>Odoo visibility attribute code</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>55</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>The attribute code from Odoo, used to set magento product visibility.
+                            </comment>
+                        </visibility_attribute_code>
+                        <visibility_mappging translate="label">
+                            <label>Visibility mapping rules</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>56</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>One rule per line. Syntax: rule id| store code| look-up value| visibility string.
+                                Ex: 1|it|italy::germany|catalog, search. The rule id 1, for the store with code it, will check
+                                if the odoo value from the attribute configured up, will be in words: it, italy, germany
+                                , and will set the visibility.
+                                Allowed values for visibility are:
+                                [Not Visible Individually],
+                                [Catalog],
+                                [Search],
+                                [Catalog, search].
+                            </comment>
+                        </visibility_mappging>
+
                         <import_images translate="label">
                             <label>Import images</label>
                             <frontend_type>select</frontend_type>

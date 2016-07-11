@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Data Helper
+ * Products Model, used to import API products to local products
  *
  */
 class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
@@ -156,15 +156,14 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
      * @param       $product
      * @param       $values
      * @param       $store_code
-     * @param array $dynamic_values
+     * @param array $dynamic_attributes
      */
-    public function saveStoreAttributes($product, $values, $store_code, $dynamic_values = array())
+    public function saveStoreAttributes($product, $values, $store_code, $dynamic_attributes = array(), $visibilityAsString = null)
     {
         static $stores;
         if (!isset($stores)) {
             $stores = Mage::helper('swisspost_api')->getStores();
         }
-        $store_id = 0;
         if (!isset($stores[$store_code])) {
             return;
         }
@@ -173,20 +172,31 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
         $mapping = Mage::helper('swisspost_api')->getMapping('catalog');
         // Apply mapping, from magento attribute code,
         $product_values = Mage::helper('swisspost_api')->__fromSwissPost($values, $mapping, $checkIfSet = true);
-        foreach ($dynamic_values as $attribute_code => $value) {
-        	$attribute_code = trim($attribute_code);
-        	if($attribute_code && Epoint_SwissPost_Api_Helper_Data::attributeEavExists($attribute_code)){
-        		$product_values[$attribute_code] = $value;	
-        	}else{
-        		Mage::helper('swisspost_api')->log('Invalid product attribute code configured:'.$attribute_code, Zend_Log::ERR);
-        	}
-            
+        foreach ($dynamic_attributes as $attribute_code => $value) {
+            $attribute_code = trim($attribute_code);
+            if($attribute_code && Epoint_SwissPost_Api_Helper_Data::attributeEavExists($attribute_code)){
+                $product_values[$attribute_code] = $value;
+            }else{
+                Mage::helper('swisspost_api')->log('Invalid product attribute code configured:'.$attribute_code, Zend_Log::ERR);
+            }
+
         }
         $updates = array();
         foreach ($product_values as $attributeCode => $value) {
-	        if ($product->getData($attributeCode) != $value) {
-	            $updates[$attributeCode] = $value;
-	        }
+            if ($product->getData($attributeCode) != $value) {
+                $updates[$attributeCode] = $value;
+            }
+        }
+        // Set visibility
+        if(Mage::getStoreConfig(Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_VISIBILITY_ATTRIBUTE_CODE)){
+            // get product visibility
+            $visibility = $this->setStoreVisibility($visibilityAsString, $store_code);
+            unset($updates['visibility']);
+            if(!is_bool($visibility)) {
+                if ($product->getData('visibility') !== $visibility) {
+                    $updates['visibility'] = $visibility;
+                }
+            }
         }
         // Exists diffs
         if ($updates) {
@@ -232,16 +242,23 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
         $values = $item[self::ODOO_PRODUCT_LANGUAGE_ATTRIBUTE_CODE];
         foreach ($mapping as $magento_store_code => $odoo_language_code) {
             $dynamic_attributes = Mage::helper('swisspost_catalog')->__fromDynamicAttributes($item);
-            
+
             $dynamic_values = array();
             foreach ($dynamic_attributes as $mage_attribute_code => $info) {
                 if (isset($info['languages'])) {
                     $dynamic_values[$mage_attribute_code] = $info['languages'][$odoo_language_code];
                 }else{
-                	$dynamic_values[$mage_attribute_code] =  $info['value'];
+                    $dynamic_values[$mage_attribute_code] =  $info['value'];
                 }
             }
-            $this->saveStoreAttributes($product, $values[$odoo_language_code], $magento_store_code, $dynamic_values);
+            $visibility = Mage::helper('swisspost_catalog')->__getVisibilityValue($item);
+            $this->saveStoreAttributes(
+                $product,
+                $values[$odoo_language_code],
+                $magento_store_code,
+                $dynamic_values,
+                $visibility
+            );
         }
     }
 
@@ -615,7 +632,7 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
             $product->setStatus(Mage_Catalog_Model_Product_Status::STATUS_DISABLED);
         }
         // Allow backend configuration.
-        if (Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_DISABLED_PRODUCTS_BY_TYPE) {
+        if (Mage::getStoreConfig(Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_DISABLED_PRODUCTS_BY_TYPE)) {
             static $disabled;
             if (!isset($disabled)) {
                 $disabled = explode(
@@ -656,5 +673,92 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
                 $product->setStatus(Mage_Catalog_Model_Product_Status::STATUS_DISABLED);
                 break;
         }
+    }
+    /**
+     * Set product visibility, and set a message about visibility of this
+     *
+     *                 (
+    [attribute_label] => Shop Sprache
+    [attribute_type] => string
+    [attribute_name] => x_shop_sprache
+    [attribute_value_string] => ALLE
+    [languages] => Array
+    (
+    [fr] => ALLE
+    [de] => ALLE
+    [it] => ALLE
+    )
+
+    )
+     *
+    <option value="">-- Please Select --</option>
+    <option value="1">Not Visible Individually</option>
+    <option value="2">Catalog</option>
+    <option value="3">Search</option>
+    <option value="4" selected="selected">Catalog, Search</option>
+     *
+    About the rules I have a correction: Please define only one rule like
+    If not in [â€˜ITâ€™|â€™itâ€™|â€™FRâ€™|â€™frâ€™|â€™deâ€™|â€™DEâ€™|â€™enâ€™|â€™ENâ€™] then
+    ignore (skip) the x_shop_sprache
+    else
+    show it in the predefine language only.
+
+    Exp:
+    I want to define, if not explicit settings are done, then it is shown in all Languages.
+    No rule about [attribute_value_string] => ALLE
+
+     * @param string $visibilityAsString
+     */
+    function setStoreVisibility($visibilityAsString, $store_code){
+        static $processed;
+        if(!$visibilityAsString){
+            return false;
+        }
+        $visibilityAsString = strtolower($visibilityAsString);
+        if(isset($processed[$store_code][$visibilityAsString])){
+            return $processed[$store_code][$visibilityAsString];
+        }
+        // Attach default values
+        static $odoo_visibility_mapping, $rules;
+        if(!isset($odoo_visibility_mapping)) {
+            //$odoo_visibility_value[$store_code][$value] = 'string visibility'
+            // Ex: id, store code| look-up value| visibility string
+            //1|it|it::italty:mamamia|catalog, search
+            //2|de|de|catalog, search
+            $odoo_visibility_mapping = Mage::helper('swisspost_api')->extractDefaultValues(
+                Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_VISIBILITY_MAPPING_VALUES
+            );
+            foreach ($odoo_visibility_mapping as $id => $rule){
+                list($store_code, $words, $visibilityString) = explode('|', trim($rule));
+                $words = explode('::', strtolower($words));
+                $rules[$store_code][$id]['lookup'] = $words;
+                $rules[$store_code][$id]['visibility'] = $visibilityString;
+            }
+        }
+        $visibility_string = null;
+        foreach ($rules[$store_code] as $id => $rule){
+            if(in_array($visibilityAsString, $rule['lookup'])){
+                $visibility_string = strtolower($rule['visibility']);
+                break;
+            }
+        }
+        switch ($visibility_string){
+            case 'not visible individually':
+                $processed[$store_code][$visibilityAsString] = Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE;
+                break;
+            case 'catalog':
+                $processed[$store_code][$visibilityAsString] = Mage_Catalog_Model_Product_Visibility::VISIBILITY_IN_CATALOG;
+                break;
+            case 'search':
+                $processed[$store_code][$visibilityAsString] = Mage_Catalog_Model_Product_Visibility::VISIBILITY_IN_SEARCH;
+                break;
+            case 'catalog, search':
+                $processed[$store_code][$visibilityAsString] = Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH;
+                break;
+            default:
+                $processed[$store_code][$visibilityAsString] = false;
+                break;
+        }
+        return $processed[$store_code][$visibilityAsString];
     }
 }

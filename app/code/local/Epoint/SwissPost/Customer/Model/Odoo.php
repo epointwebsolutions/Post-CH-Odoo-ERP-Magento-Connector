@@ -232,6 +232,7 @@ class Epoint_SwissPost_Customer_Model_Odoo extends Mage_Core_Model_Abstract
      */
     public function loadByAddress($address)
     {
+    		
         $connection = Mage::getModel('swisspost_customer/odoo')->connect(
             $address->getEmail(),
             (int)$address->getCustomerId(),
@@ -267,9 +268,15 @@ class Epoint_SwissPost_Customer_Model_Odoo extends Mage_Core_Model_Abstract
     {
         // Anonymous order
         if ($order->getCustomerIsGuest()) {
-            $address = $order->getBillingAddress();
-
-            return $this->loadByAddress($address);
+        	if($order->getCustomerEmail()){
+        		$connection = $this->loadByMail($order->getCustomerEmail());
+        		if (!$connection || !$connection->__toAccountRef()) {
+        			$connection->connectFromOrder($order);
+        		}
+        	}else{
+	            $address = $order->getBillingAddress();
+    	        $connection = $this->loadByAddress($address);
+        	}
         } else {
             $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
             // Check connection
@@ -279,12 +286,12 @@ class Epoint_SwissPost_Customer_Model_Odoo extends Mage_Core_Model_Abstract
                 $customer->getData(self::ATTRIBUTE_CODE_ODOO_ID)
             );
 
-            if (!$connection->__toAccountRef()) {
+            if (!$connection || !$connection->__toAccountRef()) {
                 $connection->connectFromOrder($order);
             }
 
-            return $connection;
         }
+        return $connection;
     }
 
     /**

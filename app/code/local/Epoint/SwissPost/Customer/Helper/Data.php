@@ -66,6 +66,7 @@ class Epoint_SwissPost_Customer_Helper_Data extends Mage_Core_Helper_Abstract
         if (!isset($account_values['account_title'])) {
             $account_values['account_title'] = Mage::helper('swisspost_api')->__toTitle($customer->getPrefix());
         }
+        $account_values['account_title'] = Mage::helper('swisspost_api')->__toTitle($account_values['account_title']);
         // load address
         $address_id = $customer->getDefaultBilling();
         if ((int)$address_id) {
@@ -144,6 +145,7 @@ class Epoint_SwissPost_Customer_Helper_Data extends Mage_Core_Helper_Abstract
     public function __toSwissPostFromAddress(Mage_Core_Model_Abstract $address, Mage_Core_Model_Abstract $order,
         $mapping = 'anonymous_customer'
     ) {
+    	
         // Load mapping
         $mapping = Mage::helper('swisspost_api')->getMapping($mapping);
         // Apply mapping
@@ -161,33 +163,33 @@ class Epoint_SwissPost_Customer_Helper_Data extends Mage_Core_Helper_Abstract
          *
          * When there are both "Default billing address" and "Default shipping address" USE the "Default billing address"
          */
-        if (!($account_values['account_gender'])) {
+        if (!isset($account_values['account_gender']) || !$account_values['account_gender']) {
             $account_values['account_gender'] = $address->getGender() == 1 ? 'male'
                 : ($address->getGender() == 2 ? 'female' : 'other');
         }
-        if (!($account_values['account_email'])) {
-            $account_values['account_email'] = $address->getEmail();
+        if (!isset($account_values['account_email']) || !($account_values['account_email'])) {
+            $account_values['account_email'] = $order->getCustomerEmail();
         }
-        if (!($account_values['account_address_type'])) {
+        if (!isset($account_values['account_address_type']) || !$account_values['account_address_type']) {
             $account_values['account_address_type'] = 'default';
         }
-        if (!($account_values['account_website'])) {
+        if (!isset($account_values['account_website']) || !$account_values['account_website']) {
             $account_values['account_website'] = $address->getWebsiteId();
         }
-        if (!($account_values['account_maintag'])) {
+        if (!isset($account_values['account_maintag']) || !($account_values['account_maintag'])) {
             $account_values['account_maintag'] = 'b2c';
         }
-        if (!($account_values['account_title'])) {
+        if (!isset($account_values['account_title']) || !($account_values['account_title'])) {
             $account_values['account_title'] = Mage::helper('swisspost_api')->__toTitle($address->getPrefix());
         }
         // load address
-        if (!($account_values['account_company'])) {
+        if (!isset($account_values['account_company']) || !($account_values['account_company'])) {
             $account_values['account_company'] = $address->getCompany();
         }
-        if (!($account_values['account_street'])) {
+        if (!isset($account_values['account_street']) || !($account_values['account_street'])) {
             $account_values['account_street'] = $address->getStreet1();
         }
-        if (!($account_values['account_street2'])) {
+        if (!isset($account_values['account_street2']) || !($account_values['account_street2'])) {
             //$account_values['account_street2'] = $address->getStreet2();
             $account_values['account_street2'] = $address->getDepartment();
         }
@@ -196,13 +198,13 @@ class Epoint_SwissPost_Customer_Helper_Data extends Mage_Core_Helper_Abstract
             $account_values['account_function'] = $address->getData('concordat_number');
         }
         //account_street_no
-        if (!($account_values['account_zip'])) {
+        if (!isset($account_values['account_zip']) || !($account_values['account_zip'])) {
             $account_values['account_zip'] = $address->getPostcode();
         }
-        if (!($account_values['account_city'])) {
+        if (!isset($account_values['account_city']) || !($account_values['account_city'])) {
             $account_values['account_city'] = $address->getCity();
         }
-        if (!($account_values['account_country'])) {
+        if (!isset($account_values['account_country']) || !($account_values['account_country'])) {
             $account_values['account_country'] = $address->getCountry();
         }
         if (isset($account_values['account_zip'])) {
@@ -210,10 +212,10 @@ class Epoint_SwissPost_Customer_Helper_Data extends Mage_Core_Helper_Abstract
                 $account_values['account_zip'], $account_values['account_country']
             );
         }
-        if (!($account_values['account_phone'])) {
+        if (!isset($account_values['account_phone']) || !($account_values['account_phone'])) {
             $account_values['account_phone'] = $address->getTelephone();
         }
-        if (!($account_values['account_fax'])) {
+        if (!isset($account_values['account_fax']) || !($account_values['account_fax'])) {
             $account_values['account_fax'] = $address->getFax();
         }
 
