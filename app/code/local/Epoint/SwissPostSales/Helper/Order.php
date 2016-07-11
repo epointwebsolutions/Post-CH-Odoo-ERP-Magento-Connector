@@ -30,7 +30,7 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
 
     const XML_CONFIG_PATH_NOTIFY_SUCCESS_EMAILS = 'swisspost_api/notification/success_emails';
 
-    const XML_CONFIG_PATH_FROM_AUTOINCREMENT = 'swisspost_api/order/from_autoincrement';
+    const XML_CONFIG_PATH_FROM_DATE = 'swisspost_api/order/from_date';
 
     const XML_CONFIG_PATH_CRON_LIMIT = 'swisspost_api/order/cron_limit';
 
@@ -225,18 +225,13 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
 
                 $invoice = $order->prepareInvoice();
                 $invoice->register();
-                // $invoice->getOrder()->setIsInProcess(true);
-                // Options: STATE_OPEN / STATE_PAID / STATE_CANCELED
                 $invoice->setState(Mage_Sales_Model_Order_Invoice::STATE_OPEN);
-                //$invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_ONLINE);            
-                //$invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_OFFLINE);
                 Mage::getModel('core/resource_transaction')
                     ->addObject($invoice)
                     ->addObject($invoice->getOrder())
                     ->save();
-                // $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, true);
-                // $order->save();
-                self::addComment($order, Mage::helper('core')->__('The invoice has been create from Epoint SiwssPost'));
+                self::addComment($order, Mage::helper('core')->__('The invoice has been create from'
+                    .' Magento-Odoo Integration module'));
                 return true;
             }
         } catch (Exception $e) {
@@ -295,11 +290,23 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
         if (Epoint_SwissPostSales_Helper_Data::OrderHasBeenProcessed($order)) {
             return false;
         }
-        // Autoincrement limit
-        if ($order->getIncrementId() <= (int)Mage::getStoreConfig(
-                Epoint_SwissPostSales_Helper_Order::XML_CONFIG_PATH_FROM_AUTOINCREMENT
-            )
-        ) {
+        if(!Mage::getStoreConfig(
+                Epoint_SwissPostSales_Helper_Order::XML_CONFIG_PATH_FROM_DATE 
+            )){
+        	Mage::helper('swisspost_api')->log(
+                      Mage::helper('core')->__('Error on check send order, from date filter is not configured: %s, odoo id: %s', 
+                      $order->getId(), 
+                      $order->getData(Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID)
+                     )
+                 );
+                 return false;
+        }
+        $from_date = date('Y-m-d H:i:s', strtotime(Mage::getStoreConfig(
+         	Epoint_SwissPostSales_Helper_Order::XML_CONFIG_PATH_FROM_DATE)
+         	)
+        );
+        // Date limit
+        if ($order->getCreatedAt() < $from_date ) {
             return false;
         }
 

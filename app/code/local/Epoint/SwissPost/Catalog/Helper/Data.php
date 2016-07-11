@@ -23,6 +23,9 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_CONFIG_IMPORT_LAST_DATE = 'swisspost_api/product/import_last_date';
     const XML_CONFIG_IMPORT_CUSTOM_ORDER = 'swisspost_api/product/import_custom_order';
 
+    const XML_CONFIG_VISIBILITY_ATTRIBUTE_CODE = 'swisspost_api/product/visibility_attribute_code';
+    const XML_CONFIG_VISIBILITY_MAPPING_VALUES = 'swisspost_api/product/visibility_mappging';
+
     /**
      * Get field for attribute mapping
      *
@@ -170,5 +173,35 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
             $values[$mage_attribute_code] = $odoo_values[$odoo_attribute_code];
         }
         return $values;
+    }
+    /**
+     * Get SwissPost value rom visibility
+     *
+     * @param $item
+     *
+     * @return string
+     */
+    public static function __getVisibilityValue($item)
+    {
+        $odoo_visibility_value = null;
+        static $attribute_code;
+        if(!isset($attribute_code)) {
+            $attribute_code = Mage::getStoreConfig(Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_VISIBILITY_ATTRIBUTE_CODE);
+        }
+        if($attribute_code){
+            if($item[$attribute_code]){
+                $odoo_visibility_value = $item[$attribute_code];
+            }else{
+                foreach ($item['dynamic_attributes'] as $attribute) {
+                    if($attribute['attribute_name'] == $attribute_code){
+                        $type = $attribute['attribute_type'];
+                        $key = 'attribute_value_' . $type;
+                        $odoo_visibility_value = $attribute[$key];
+                        break;
+                    }
+                }
+            }
+        }
+        return $odoo_visibility_value;
     }
 }

@@ -18,9 +18,10 @@ class Epoint_SwissPost_Catalog_Model_Cron
             $options['limit'] = (int)Mage::getStoreConfig(Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_IMPORT_LIMIT);
           }
           $last_import_timestamp = strtotime(Mage::getStoreConfig(Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_IMPORT_LAST_DATE));
-          
-          if(!$last_import){
-            $last_import_date = date('Y-m-d', strtotime('3 days'));
+          $new_last_import_date = date('Y-m-d');
+          // go back 3 days
+          if(!$last_import_timestamp){
+            $last_import_date = date('Y-m-d', strtotime('-14 days'));
           }else{
             $last_import_date = date('Y-m-d', $last_import_timestamp);
           }
@@ -35,7 +36,7 @@ class Epoint_SwissPost_Catalog_Model_Cron
           $products = $result->getValues();
           Mage::getModel('swisspost_catalog/Products')->import($products);
           // save last date
-          Mage::getModel('core/config')->saveConfig(Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_IMPORT_LAST_DATE, $last_import_date);
+          Mage::getModel('core/config')->saveConfig(Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_IMPORT_LAST_DATE, $new_last_import_date);
         }catch (Exception $e){
           Epoint_SwissPost_Api_Helper_Data::LogException($e);
         }

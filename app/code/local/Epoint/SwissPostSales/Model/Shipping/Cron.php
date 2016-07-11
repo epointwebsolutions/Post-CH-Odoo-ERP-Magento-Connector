@@ -8,6 +8,10 @@ class Epoint_SwissPostSales_Model_Shipping_Cron
      */
     public function getTransferStatus()
     {
+    	$from_date = date('Y-m-d H:i:s', strtotime(Mage::getStoreConfig(
+         	Epoint_SwissPostSales_Helper_Order::XML_CONFIG_PATH_FROM_DATE)
+         	)
+        );
         // All orders without odoo code id
         $order_collection = Mage::getModel('sales/order')
             ->getCollection()
@@ -16,10 +20,8 @@ class Epoint_SwissPostSales_Model_Shipping_Cron
               'invoice.order_id=main_table.entity_id', 
             array('invoice_entity_id'=>'entity_id'), null , 'left')
               ->addAttributeToFilter(
-                'main_table.increment_id',
-                 array('gt' => (int)Mage::getStoreConfig(
-                  Epoint_SwissPostSales_Helper_Order::XML_CONFIG_PATH_FROM_AUTOINCREMENT)
-                 )
+                'main_table.created_at',
+                 array('gt' => $from_date)
             )            
             // Filter payment status
             ->addAttributeToFilter(

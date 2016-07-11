@@ -86,6 +86,21 @@
                 <class>Epoint_SwissPost_Customer_Helper</class>
             </swisspost_customer>
         </helpers>
+         <models>
+            <swisspost_customer>
+                <class>Epoint_SwissPost_Customer_Model</class>
+                <resourceModel>swisspost_customer_mysql4</resourceModel>
+            </swisspost_customer>
+            <swisspost_customer_mysql4>
+                <class>Epoint_SwissPost_Customer_Model_Mysql4</class>
+                <entities>
+                    <odoo>
+                        <table>epoint_swisspost_customer_odoo</table>
+                    </odoo>
+                </entities>
+            </swisspost_customer_mysql4>
+        </models>
+      <!--  New magento version over 1.6
         <models>
             <swisspost_customer>
                 <class>Epoint_SwissPost_Customer_Model</class>
@@ -100,6 +115,7 @@
                 </entities>
             </swisspost_customer_resource>
         </models>
+        -->
         <resources>
             <swisspost_customer_setup>
                 <setup>

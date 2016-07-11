@@ -214,7 +214,7 @@ class Epoint_SwissPost_Customer_Model_Customer_Observer
     public function SwissPostApiBeforeCreateUpdateAnonymousAccount(Varien_Event_Observer $observer)
     {
         // Load data.
-        $order = $observer->getAddress();
+        $order = $observer->getOrder();
         $address = $observer->getAddress();
         $account = $observer->getAccount();
         // Pass values
