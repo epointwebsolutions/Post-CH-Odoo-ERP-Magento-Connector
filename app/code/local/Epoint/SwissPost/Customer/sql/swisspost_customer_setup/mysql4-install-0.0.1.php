@@ -54,7 +54,7 @@ Mage::getSingleton('eav/config')
     ->setData('used_in_forms', array('adminhtml_customer_address'))
     ->save();
 
-$installer->getConnection()
+/*$installer->getConnection()
     ->addColumn(
         $installer->getTable('sales/order_address'), 'odoo_id',
         array(
@@ -72,7 +72,19 @@ $installer->getConnection()
         $installer->getIdxName('sales/order_address', array('odoo_id'), Varien_Db_Adapter_Interface::INDEX_TYPE_INDEX),
         array('odoo_id'),
         Varien_Db_Adapter_Interface::INDEX_TYPE_INDEX
-    );
+    );*/
+
+$installer->run("CREATE TABLE IF NOT EXISTS `epoint_swisspost_customer_odoo` (
+	  `connection_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Connection Id',
+	  `mail` varchar(128) NOT NULL DEFAULT '' COMMENT 'Email customer',
+	  `odoo_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'External odoo_id',
+	  `customer_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Customer id',
+	  PRIMARY KEY (`connection_id`),
+	  UNIQUE KEY `mail` (`mail`),
+	  KEY `customer_id` (`customer_id`),
+	  KEY `odoo_id` (`odoo_id`)
+	)ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='epoint_swisspost_customer_odoo' AUTO_INCREMENT=52 "
+);/*
 // Create table to store  
 $table = $installer->getConnection()
     ->newTable($installer->getTable('swisspost_customer/odoo'))
@@ -137,4 +149,5 @@ if ($installer->tableExists($installer->getTable('swisspost_customer/odoo'))) {
 if (!$installer->getConnection()->isTableExists($table->getName())) {
     $installer->getConnection()->createTable($table);
 }
+*/
 $installer->endSetup();
