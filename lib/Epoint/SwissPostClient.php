@@ -283,7 +283,9 @@ class Epoint_SwissPostClient
             return false;
         }
         $data = $this->getResult($result);
-        $this->session_id = $data['session_id'];
+        if(isset($data['session_id'])){
+        	$this->session_id = $data['session_id'];
+        }
         $this->md5 = md5($this->session_id, @file_get_contents($this->cookie_file_path));
         // Add auth
         /**
