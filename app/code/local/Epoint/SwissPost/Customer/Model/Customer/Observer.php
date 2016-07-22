@@ -194,15 +194,16 @@ class Epoint_SwissPost_Customer_Model_Customer_Observer
     {
         // Load customer.
         $address = $observer->getAddress();
+        $order = $observer->getOrder();
         $account = $observer->getAccount();
         $result = $observer->getResult();
         // Check connection
-        $connection = Mage::getModel('swisspost_customer/odoo')->loadByAddress($address);
+        $connection = Mage::getModel('swisspost_customer/odoo')->loadByOrder($order);
         // Get back odoo id.
         if ($result->getResult('odoo_id')) {
-            $connection->reConnect($address->getEmail(), 0, $result->getResult('odoo_id'));
+        	// Reconnect data.
+            $connection->reConnect($connection->getMail(), 0, $result->getResult('odoo_id'));
         }
-
     }
 
     /**
@@ -222,7 +223,7 @@ class Epoint_SwissPost_Customer_Model_Customer_Observer
         foreach ($account_values as $property => $value) {
             $account->{$property} = $value;
         }
-        $connection = Mage::getModel('swisspost_customer/odoo')->loadByAddress($address);
+        $connection = Mage::getModel('swisspost_customer/odoo')->loadByOrder($order);
         // Attach connections
         if ($connection) {
             $account->account_ref = $connection->__toAccountRef();

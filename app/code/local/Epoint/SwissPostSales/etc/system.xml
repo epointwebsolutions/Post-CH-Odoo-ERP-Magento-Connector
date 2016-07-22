@@ -23,7 +23,7 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <comment>If is enabled the order will be send over the cron</comment>
+                            <comment>Use cron to send orders.</comment>
                         </enable_cron>
                        <from_date translate="label">
                             <label>Sent order with creation date greatest than</label>
