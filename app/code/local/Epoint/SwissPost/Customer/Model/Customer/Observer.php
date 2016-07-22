@@ -202,7 +202,7 @@ class Epoint_SwissPost_Customer_Model_Customer_Observer
         // Get back odoo id.
         if ($result->getResult('odoo_id')) {
         	// Reconnect data.
-            $connection->reConnect($connection->getMail(), 0, $result->getResult('odoo_id'));
+            $connection->reConnect($account->account_email, 0, $result->getResult('odoo_id'));
         }
     }
 
