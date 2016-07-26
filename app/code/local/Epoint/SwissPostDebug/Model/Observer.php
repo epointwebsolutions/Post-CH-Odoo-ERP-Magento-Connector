@@ -11,7 +11,7 @@ class Epoint_SwissPostDebug_Model_Observer
     {
         $_block = $observer->getBlock();
         $_type = $_block->getType();
-        if ($_type == 'adminhtml/catalog_product_edit') {
+        if ($_block->getId() == 'product_edit' && $_block->getModuleName() == 'Mage_Adminhtml') {
 
             $_block->setChild(
                 'product_import_button',
