@@ -109,12 +109,15 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
             $sale_order_values[$key] = $value;
         }
         // Attach delivery method
-        if (!isset($sale_order_values['delivery_method']) || !$sale_order_values['delivery_method']) {
+           if (!isset($sale_order_values['delivery_method']) || !$sale_order_values['delivery_method']) {
             $sale_order_values['delivery_method'] = Mage::getStoreConfig(self::XML_CONFIG_PATH_SHIPPING_DEFAULT);
             $mapping = Mage::helper('swisspost_api')->extractDefaultValues(self::XML_CONFIG_PATH_SHIPPING_MAPPING);
             $code = strtolower($order->getShippingMethod());
-            if (isset($mapping[$code])) {
-                $sale_order_values['delivery_method'] = $mapping[$code];
+            foreach ($mapping as $candidateCode=>$odooDeliveryMethodCode){
+            	if(strtolower($candidateCode) == $code){
+            		$sale_order_values['delivery_method'] = $odooDeliveryMethodCode;	
+            		break;
+            	}
             }
         }
         // Attach payment method
@@ -122,8 +125,11 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
             $sale_order_values['payment_method'] = Mage::getStoreConfig(self::XML_CONFIG_PATH_PAYMENT_DEFAULT);
             $mapping = Mage::helper('swisspost_api')->extractDefaultValues(self::XML_CONFIG_PATH_PAYMENT_MAPPING);
             $code = strtolower($order->getPayment()->getMethodInstance()->getCode());
-            if (isset($mapping[$code])) {
-                $sale_order_values['payment_method'] = $mapping[$code];
+            foreach ($mapping as $candidateCode=>$odooPaymentMethodCode){
+            	if(strtolower($candidateCode) == $code){
+            		$sale_order_values['delivery_method'] = $odooPaymentMethodCode;	
+            		break;
+            	}
             }
         }
         // Date length is 10;
