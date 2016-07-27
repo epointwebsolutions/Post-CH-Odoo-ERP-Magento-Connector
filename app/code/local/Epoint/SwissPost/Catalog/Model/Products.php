@@ -273,24 +273,25 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
     public function setRelatedProducts($product, $_item)
     {
         $linkData = false;
-        $alternative_products = $_item['alternative_products'];
-        if (!empty($alternative_products) and is_array($alternative_products)) {
-            $i = 0;
-            foreach ($alternative_products as $_id) {
-                $i++;
-                $prod = Mage::getModel('catalog/product')->loadByAttribute('odoo_id', $_id);
-                if ($prod) {
-                    $prod_id[$i] = $prod->getId();
-                    $linkData[$prod_id[$i]] = array('position' => $i);
-                }
-            }
-
-            if ($linkData) {
-                $product->setRelatedLinkData($linkData);
-                Mage::helper('swisspost_api')->log("Related products:".$prod_id);
-            }
+        if(isset($_item['alternative_products'])){
+	        $alternative_products = $_item['alternative_products'];
+	        if (!empty($alternative_products) and is_array($alternative_products)) {
+	            $i = 0;
+	            foreach ($alternative_products as $_id) {
+	                $i++;
+	                $prod = Mage::getModel('catalog/product')->loadByAttribute('odoo_id', $_id);
+	                if ($prod) {
+	                    $prod_id[$i] = $prod->getId();
+	                    $linkData[$prod_id[$i]] = array('position' => $i);
+	                }
+	            }
+	
+	            if ($linkData) {
+	                $product->setRelatedLinkData($linkData);
+	                Mage::helper('swisspost_api')->log("Related products:".$prod_id);
+	            }
+	        }
         }
-
         return $product;
     }
 
@@ -698,7 +699,7 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
     <option value="4" selected="selected">Catalog, Search</option>
      *
     About the rules I have a correction: Please define only one rule like
-    If not in [â€˜ITâ€™|â€™itâ€™|â€™FRâ€™|â€™frâ€™|â€™deâ€™|â€™DEâ€™|â€™enâ€™|â€™ENâ€™] then
+    If not in [Ã¢â‚¬ËœITÃ¢â‚¬â„¢|Ã¢â‚¬â„¢itÃ¢â‚¬â„¢|Ã¢â‚¬â„¢FRÃ¢â‚¬â„¢|Ã¢â‚¬â„¢frÃ¢â‚¬â„¢|Ã¢â‚¬â„¢deÃ¢â‚¬â„¢|Ã¢â‚¬â„¢DEÃ¢â‚¬â„¢|Ã¢â‚¬â„¢enÃ¢â‚¬â„¢|Ã¢â‚¬â„¢ENÃ¢â‚¬â„¢] then
     ignore (skip) the x_shop_sprache
     else
     show it in the predefine language only.
