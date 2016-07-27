@@ -146,6 +146,8 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
     {
         static $mapping;
         static $loaded;
+        
+        $values = array();
         if (isset($loaded[$item['product_code']])) {
             return $loaded[$item['product_code']];
         }
@@ -164,17 +166,18 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
                 $type = $attribute['attribute_type'];
                 $key = 'attribute_value_' . $type;
                 $odoo_values[$attribute['attribute_name']]['value'] = $attribute[$key];
-                if ($attribute['languages']) {
+                if (isset($attribute['languages']) && $attribute['languages']) {
                     $odoo_values[$attribute['attribute_name']]['languages'] = $attribute['languages'];
                 }
             }
         }
         foreach ($mapping as $odoo_attribute_code => $mage_attribute_code) {
-            $values[$mage_attribute_code] = $odoo_values[$odoo_attribute_code];
+        	if(isset($odoo_values[$odoo_attribute_code])){
+            	$values[$mage_attribute_code] = $odoo_values[$odoo_attribute_code];
+        	}
         }
         return $values;
-    }
-    /**
+    }    /**
      * Get SwissPost value rom visibility
      *
      * @param $item
