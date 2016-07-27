@@ -106,36 +106,6 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Get Swisspost class id, from a product
-     *
-     * @param $product
-     *
-     * @return int
-     */
-    public static function __toSiwssPostTaxClassId($product)
-    {
-        static $mapping;
-        $taxClassId = $product->getTaxClassId();
-        if (!isset($mapping)) {
-            $fields = array();
-        } else {
-            return isset($mapping[$taxClassId]) ? $mapping[$taxClassId] : 0;
-        }
-        $attribute_code = Mage::getStoreConfig(self::XML_CONFIG_PATH_ODOO_TAX_CLASS_ATTRIBUTE_CODE);
-        $configured = Mage::helper('swisspost_api')->textToArray(
-            Mage::getStoreConfig(self::XML_CONFIG_PATH_TAX_CLASS_MAPPING)
-        );
-        $mapping = array();
-        if ($configured) {
-            foreach ($configured as $odoo_tax_class_id => $mage_tax_class_id) {
-                $mapping[strtolower($mage_tax_class_id)] = $odoo_tax_class_id;
-            }
-        }
-
-        return isset($mapping[$taxClassId]) ? $mapping[$taxClassId] : 0;
-    }
-
-    /**
      * Get SwissPost values
      *
      * @param $item
@@ -146,6 +116,8 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
     {
         static $mapping;
         static $loaded;
+        
+        $values = array();
         if (isset($loaded[$item['product_code']])) {
             return $loaded[$item['product_code']];
         }
@@ -164,13 +136,15 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
                 $type = $attribute['attribute_type'];
                 $key = 'attribute_value_' . $type;
                 $odoo_values[$attribute['attribute_name']]['value'] = $attribute[$key];
-                if ($attribute['languages']) {
+                if (isset($attribute['languages']) && $attribute['languages']) {
                     $odoo_values[$attribute['attribute_name']]['languages'] = $attribute['languages'];
                 }
             }
         }
         foreach ($mapping as $odoo_attribute_code => $mage_attribute_code) {
-            $values[$mage_attribute_code] = $odoo_values[$odoo_attribute_code];
+        	if(isset($odoo_values[$odoo_attribute_code])){
+            	$values[$mage_attribute_code] = $odoo_values[$odoo_attribute_code];
+        	}
         }
         return $values;
     }
