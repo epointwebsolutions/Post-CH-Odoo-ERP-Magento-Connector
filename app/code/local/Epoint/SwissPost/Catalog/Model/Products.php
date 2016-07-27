@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Data Helper
+ * Products Model, used to import API products to local products
  *
  */
 class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
@@ -179,6 +179,7 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
             }else{
                 Mage::helper('swisspost_api')->log('Invalid product attribute code configured:'.$attribute_code, Zend_Log::ERR);
             }
+
         }
         $updates = array();
         foreach ($product_values as $attributeCode => $value) {
@@ -187,16 +188,14 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
             }
         }
         // Set visibility
-        static $use_visibility;
-        if(!isset($use_visibility)){
-          $use_visibility = Mage::getStoreConfig(Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_VISIBILITY_ATTRIBUTE_CODE);
-        }
-        if($use_visibility){
+        if(Mage::getStoreConfig(Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_VISIBILITY_ATTRIBUTE_CODE)){
             // get product visibility
             $visibility = $this->setStoreVisibility($visibilityAsString, $store_code);
             unset($updates['visibility']);
             if(!is_bool($visibility)) {
-              $updates['visibility'] = $visibility;
+                if ($product->getData('visibility') !== $visibility) {
+                    $updates['visibility'] = $visibility;
+                }
             }
         }
         // Exists diffs
@@ -225,7 +224,6 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
                 Mage::getStoreConfig(Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_PATH_STORE_ATTRIBUTE_MAPPING)
             );
         }
-        
         if (!$mapping) {
             return;
         }
@@ -242,7 +240,6 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
             return;
         }
         $values = $item[self::ODOO_PRODUCT_LANGUAGE_ATTRIBUTE_CODE];
-        $visibilityAsString = Mage::helper('swisspost_catalog')->__getVisibilityValue($item);
         foreach ($mapping as $magento_store_code => $odoo_language_code) {
             $dynamic_attributes = Mage::helper('swisspost_catalog')->__fromDynamicAttributes($item);
 
@@ -254,12 +251,13 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
                     $dynamic_values[$mage_attribute_code] =  $info['value'];
                 }
             }
+            $visibility = Mage::helper('swisspost_catalog')->__getVisibilityValue($item);
             $this->saveStoreAttributes(
                 $product,
                 $values[$odoo_language_code],
                 $magento_store_code,
                 $dynamic_values,
-                $visibilityAsString
+                $visibility
             );
         }
     }
@@ -275,24 +273,25 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
     public function setRelatedProducts($product, $_item)
     {
         $linkData = false;
-        $alternative_products = $_item['alternative_products'];
-        if (!empty($alternative_products) and is_array($alternative_products)) {
-            $i = 0;
-            foreach ($alternative_products as $_id) {
-                $i++;
-                $prod = Mage::getModel('catalog/product')->loadByAttribute('odoo_id', $_id);
-                if ($prod) {
-                    $prod_id[$i] = $prod->getId();
-                    $linkData[$prod_id[$i]] = array('position' => $i);
-                }
-            }
-
-            if ($linkData) {
-                $product->setRelatedLinkData($linkData);
-                Mage::helper('swisspost_api')->log("Related products:".$prod_id);
-            }
+        if(isset($_item['alternative_products'])){
+	        $alternative_products = $_item['alternative_products'];
+	        if (!empty($alternative_products) and is_array($alternative_products)) {
+	            $i = 0;
+	            foreach ($alternative_products as $_id) {
+	                $i++;
+	                $prod = Mage::getModel('catalog/product')->loadByAttribute('odoo_id', $_id);
+	                if ($prod) {
+	                    $prod_id[$i] = $prod->getId();
+	                    $linkData[$prod_id[$i]] = array('position' => $i);
+	                }
+	            }
+	
+	            if ($linkData) {
+	                $product->setRelatedLinkData($linkData);
+	                Mage::helper('swisspost_api')->log("Related products:".$prod_id);
+	            }
+	        }
         }
-
         return $product;
     }
 
@@ -700,7 +699,7 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
     <option value="4" selected="selected">Catalog, Search</option>
      *
     About the rules I have a correction: Please define only one rule like
-    If not in [â€˜ITâ€™|â€™itâ€™|â€™FRâ€™|â€™frâ€™|â€™deâ€™|â€™DEâ€™|â€™enâ€™|â€™ENâ€™] then
+    If not in [Ã¢â‚¬ËœITÃ¢â‚¬â„¢|Ã¢â‚¬â„¢itÃ¢â‚¬â„¢|Ã¢â‚¬â„¢FRÃ¢â‚¬â„¢|Ã¢â‚¬â„¢frÃ¢â‚¬â„¢|Ã¢â‚¬â„¢deÃ¢â‚¬â„¢|Ã¢â‚¬â„¢DEÃ¢â‚¬â„¢|Ã¢â‚¬â„¢enÃ¢â‚¬â„¢|Ã¢â‚¬â„¢ENÃ¢â‚¬â„¢] then
     ignore (skip) the x_shop_sprache
     else
     show it in the predefine language only.
@@ -717,48 +716,49 @@ class Epoint_SwissPost_Catalog_Model_Products extends Mage_Core_Model_Abstract
             return false;
         }
         $visibilityAsString = strtolower($visibilityAsString);
-        if(!isset($processed[$store_code][$visibilityAsString])){
-          // Attach default values
-          static $odoo_visibility_mapping, $rules;
-          if(!isset($odoo_visibility_mapping)) {
-              //$odoo_visibility_value[$store_code][$value] = 'string visibility'
-              // Ex: id, store code| look-up value| visibility string
-              //1|it|it|catalog, search
-              //2|de|de|catalog, search
-              $odoo_visibility_mapping = Mage::helper('swisspost_api')->extractDefaultValues(
-                  Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_VISIBILITY_MAPPING_VALUES
-              );
-              foreach ($odoo_visibility_mapping as $id => $rule){
-                  list($config_store_code, $words, $visibilityString) = explode('|', trim($rule));
-                  $words = explode('::', strtolower($words));
-                  $rules[$config_store_code][$id]['lookup'] = $words;
-                  $rules[$config_store_code][$id]['visibility'] = $visibilityString;
-              }
-          }
-          $visibility_string = null;
-          foreach ($rules[$store_code] as $id => $rule){
-              if(in_array($visibilityAsString, $rule['lookup'])){
-                  $visibility_string = strtolower($rule['visibility']);
-                  break;
-              }
-          }
-          switch ($visibility_string){
-              case 'not visible individually':
-                  $processed[$store_code][$visibilityAsString] = Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE;
-                  break;
-              case 'catalog':
-                  $processed[$store_code][$visibilityAsString] = Mage_Catalog_Model_Product_Visibility::VISIBILITY_IN_CATALOG;
-                  break;
-              case 'search':
-                  $processed[$store_code][$visibilityAsString] = Mage_Catalog_Model_Product_Visibility::VISIBILITY_IN_SEARCH;
-                  break;
-              case 'catalog, search':
-                  $processed[$store_code][$visibilityAsString] = Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH;
-                  break;
-              default:
-                  $processed[$store_code][$visibilityAsString] = false;
-                  break;
-          }
+        if(isset($processed[$store_code][$visibilityAsString])){
+            return $processed[$store_code][$visibilityAsString];
+        }
+        // Attach default values
+        static $odoo_visibility_mapping, $rules;
+        if(!isset($odoo_visibility_mapping)) {
+            //$odoo_visibility_value[$store_code][$value] = 'string visibility'
+            // Ex: id, store code| look-up value| visibility string
+            //1|it|it::italty:mamamia|catalog, search
+            //2|de|de|catalog, search
+            $odoo_visibility_mapping = Mage::helper('swisspost_api')->extractDefaultValues(
+                Epoint_SwissPost_Catalog_Helper_Data::XML_CONFIG_VISIBILITY_MAPPING_VALUES
+            );
+            foreach ($odoo_visibility_mapping as $id => $rule){
+                list($store_code, $words, $visibilityString) = explode('|', trim($rule));
+                $words = explode('::', strtolower($words));
+                $rules[$store_code][$id]['lookup'] = $words;
+                $rules[$store_code][$id]['visibility'] = $visibilityString;
+            }
+        }
+        $visibility_string = null;
+        foreach ($rules[$store_code] as $id => $rule){
+            if(in_array($visibilityAsString, $rule['lookup'])){
+                $visibility_string = strtolower($rule['visibility']);
+                break;
+            }
+        }
+        switch ($visibility_string){
+            case 'not visible individually':
+                $processed[$store_code][$visibilityAsString] = Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE;
+                break;
+            case 'catalog':
+                $processed[$store_code][$visibilityAsString] = Mage_Catalog_Model_Product_Visibility::VISIBILITY_IN_CATALOG;
+                break;
+            case 'search':
+                $processed[$store_code][$visibilityAsString] = Mage_Catalog_Model_Product_Visibility::VISIBILITY_IN_SEARCH;
+                break;
+            case 'catalog, search':
+                $processed[$store_code][$visibilityAsString] = Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH;
+                break;
+            default:
+                $processed[$store_code][$visibilityAsString] = false;
+                break;
         }
         return $processed[$store_code][$visibilityAsString];
     }
