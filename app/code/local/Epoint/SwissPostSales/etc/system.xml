@@ -96,7 +96,9 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment>Format: magento_payment_code|odoo_payment_code, one entry per line</comment>
+                            <comment>Format: magento_payment_code[cc_type:type]|odoo_payment_code, one entry per line. 
+                            Ex: postfinance[cc_type:visa]|VISA
+                            postfinance|INV</comment>
                         </mapping>
                     </fields>
                 </order_payment_method>
