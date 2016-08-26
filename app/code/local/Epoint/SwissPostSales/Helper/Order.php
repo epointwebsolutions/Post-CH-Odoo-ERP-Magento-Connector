@@ -116,15 +116,10 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
             if (isset($mapping[$code])) {
                 $sale_order_values['delivery_method'] = $mapping[$code];
             }
-        }
+        } 
         // Attach payment method
         if (!isset($sale_order_values['payment_method']) || !$sale_order_values['payment_method']) {
-            $sale_order_values['payment_method'] = Mage::getStoreConfig(self::XML_CONFIG_PATH_PAYMENT_DEFAULT);
-            $mapping = Mage::helper('swisspost_api')->extractDefaultValues(self::XML_CONFIG_PATH_PAYMENT_MAPPING);
-            $code = strtolower($order->getPayment()->getMethodInstance()->getCode());
-            if (isset($mapping[$code])) {
-                $sale_order_values['payment_method'] = $mapping[$code];
-            }
+          $sale_order_values['payment_method'] = self::__toPaymentMethod($order);
         }
         // Date length is 10;
         if (!isset($sale_order_values['date_order'])) {
@@ -495,5 +490,44 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
               Mage::helper('core')->__('Set order status completed')
           );
     }
+  }
+  
+  /**
+   * Get payment method for oddo
+   * @param $order
+   * @return string $method
+   */
+  static function __toPaymentMethod(Mage_Sales_Model_Order $order){
+      $method = '';
+      $payment_mapping = Mage::helper('swisspost_api')->extractDefaultValues(self::XML_CONFIG_PATH_PAYMENT_MAPPING);
+      $code = strtolower($order->getPayment()->getMethodInstance()->getCode());
+      $cc_name = strtolower($order->getPayment()->getCcType());
+      /**
+       * check cc card type
+       */
+      // special case
+      if($cc_name){
+         $code_with_cc = $code.'[cc_type:'.$cc_name.']';
+         foreach ($payment_mapping as $candidateCode=>$odooPaymentMethodCode){
+        	if(strtolower($candidateCode) == $code_with_cc){
+        		$method = $odooPaymentMethodCode;
+        		break;
+        	}
+        }
+      }
+      if(!$method){
+        if($payment_mapping){
+          foreach ($payment_mapping as $candidateCode=>$odooPaymentMethodCode){
+          	if(strtolower($candidateCode) == $code){
+          		$method = $odooPaymentMethodCode;	
+          		break;
+          	}
+          }
+        }
+      }
+      if(!$method){
+        $method = Mage::getStoreConfig(self::XML_CONFIG_PATH_PAYMENT_DEFAULT);
+      }
+      return $method;
   }
 }
