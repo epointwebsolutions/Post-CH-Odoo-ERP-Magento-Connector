@@ -159,7 +159,7 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
         
         switch ($mapping['order_ref']){
           case 'increment_id':
-               $order = Mage::getModel('sales/order')->load($order_ref, 'increment_id');
+               $order = Mage::getModel('sales/order')->loadByIncrementId($order_ref);
             break;          
             case 'entity_id':
                $order = Mage::getModel('sales/order')->load($order_ref);
