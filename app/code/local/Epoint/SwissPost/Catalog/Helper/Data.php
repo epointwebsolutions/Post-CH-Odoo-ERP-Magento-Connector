@@ -24,7 +24,7 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_CONFIG_IMPORT_CUSTOM_ORDER = 'swisspost_api/product/import_custom_order';
     const XML_CONFIG_ENABLE_CRON_IMPORT_PRODUCTS = 'swisspost_api/product/enable_cron_import';
     const XML_CONFIG_ENABLE_CRON_IMPORT_CATEGORIES = 'swisspost_api/product/enable_cron_import_categories';
-    const XML_CONFIG_ENABLE_CRON_IMPORT_INVENTORY = 'swisspost_api/product/enable_cron_import_stock';
+    const XML_CONFIG_ENABLE_CRON_IMPORT_INVENTORY = 'swisspost_api/product/enable_cron_import_inventory';
 
     /**
      * Get field for attribute mapping
