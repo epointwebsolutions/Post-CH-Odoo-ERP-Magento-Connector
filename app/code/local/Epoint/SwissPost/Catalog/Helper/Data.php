@@ -9,6 +9,9 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Setting path for mapping fields, default values
      */
+    /**
+     * Setting path for mapping fields, default values
+     */
     const XML_CONFIG_PATH_DEFAULT_VALUES = 'swisspost_api/product/default_values';
     const XML_CONFIG_PATH_API_FIELDS = 'swisspost_api/product/fields';
     const XML_CONFIG_PATH_DINAMYC_ATTRIBUTE_MAPPING = 'swisspost_api/product/dynamic_attribute_mapping';
@@ -22,6 +25,9 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_CONFIG_ENABLE_IMPORT_FILTER_CHANGED = 'swisspost_api/product/import_filter_changed';
     const XML_CONFIG_IMPORT_LAST_DATE = 'swisspost_api/product/import_last_date';
     const XML_CONFIG_IMPORT_CUSTOM_ORDER = 'swisspost_api/product/import_custom_order';
+    const XML_CONFIG_ENABLE_CRON_IMPORT_PRODUCTS = 'swisspost_api/product/enable_cron_import';
+    const XML_CONFIG_ENABLE_CRON_IMPORT_CATEGORIES = 'swisspost_api/product/enable_cron_import_categories';
+    const XML_CONFIG_ENABLE_CRON_IMPORT_INVENTORY = 'swisspost_api/product/enable_cron_import_inventory';
 
     const XML_CONFIG_VISIBILITY_ATTRIBUTE_CODE = 'swisspost_api/product/visibility_attribute_code';
     const XML_CONFIG_VISIBILITY_MAPPING_VALUES = 'swisspost_api/product/visibility_mappging';
