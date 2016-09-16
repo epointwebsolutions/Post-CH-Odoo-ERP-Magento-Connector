@@ -34,6 +34,15 @@
                             <show_in_store>0</show_in_store>
                             <comment>Only orders with date greatest than configured will be sent, format : YYYY-mm-dd</comment>
                         </from_date>
+                        <status translate="label">
+                            <label>Order status on cron search</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Only orders with those statuses will be sent by the cron, many entries, comma separated.</comment>
+                        </status>
                         <cron_limit translate="label">
                             <label>Processed orders on cron execution</label>
                             <frontend_type>text</frontend_type>
