@@ -23,25 +23,26 @@ class Epoint_SwissPostSales_Helper_Product extends Mage_Core_Helper_Abstract
         $line->name = $item->getName();
         $line->price_unit = $item->getPrice();
         $line->quantity = $item->getQtyOrdered();
-        $line->discount = $item->getDiscountAmount() > 0 && $line->quantity > 0 ? $item->getDiscountAmount() : 0;
+        //$line->discount = $item->getDiscountAmount() > 0 && $line->quantity > 0 ? $item->getDiscountAmount() : 0;
+        // Changed discount formula, seems to be different for ENT.
+        $line->discount = $item->getPrice()  > 0 && $line->quantity > 0 ? ($item->getOriginalPrice() - $item->getPrice()) * $line->quantity : 0;
         // convert it to percent
         if ($line->discount > 0) {
             $percent = ((($line->discount / $line->quantity) * 100) / $line->price_unit);
             $line->discount = number_format($percent, 2);
+        }else{
+            $line->discount = 0;
         }
-
         $product = Mage::helper('swisspost_api')->loadProductBySku($item->getSku());
-
         // Share action
         Mage::dispatchEvent(
-            'swisspost_api_order_prepare_line',
-            array(
-                'order'   => $order,
-                'product' => $product,
-                'line'    => $line,
-            )
+          'swisspost_api_order_prepare_line',
+          array(
+            'order'   => $order,
+            'product' => $product,
+            'line'    => $line,
+          )
         );
-
         return (array)$line;
     }
 }
