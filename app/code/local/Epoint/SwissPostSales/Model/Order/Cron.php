@@ -24,19 +24,17 @@ class Epoint_SwissPostSales_Model_Order_Cron
             Epoint_SwissPostSales_Helper_Order::XML_CONFIG_PATH_FROM_DATE)
           )
         );
-
         // All orders without odoo code id
         $order_collection = Mage::getModel('sales/order')
-
           ->getCollection();
         // Odoo connection first condition.
         $attribute = Mage::getModel('eav/entity_attribute')->loadByCode('invoice', 'order_id');
         if($attribute){
             $order_collection->getSelect()->join(
               array('invoice' =>  'sales_order_entity_int'),
-              'invoice.entity_id = e.entity_id AND invoice.attribute_id='.$attribute->getId()
+              'invoice.value = e.entity_id AND invoice.attribute_id='.$attribute->getId()
               .' AND invoice.entity_type_id='.$attribute->getEntityTypeId(),
-              array('invoice.value AS invoice_id')
+              array('invoice.entity_id AS invoice_id')
             );
         }
         $attribute_odoo = Mage::getModel('eav/entity_attribute')->loadByCode('order',

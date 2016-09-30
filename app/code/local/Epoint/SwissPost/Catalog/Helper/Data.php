@@ -66,9 +66,7 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
     public static function __toTaxClassId($odoo_tax_class_id)
     {
         static $mapping;
-        if (!isset($mapping)) {
-            $fields = array();
-        } else {
+        if (isset($mapping)) {
             return isset($mapping[$odoo_tax_class_id]) ? $mapping[$odoo_tax_class_id] : 0;;
         }
         $configured = Mage::helper('swisspost_api')->textToArray(
@@ -87,33 +85,6 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Get Swisspost class id, from a product
      *
-     * @param $item
-     *
-     * @return int
-     */
-    public static function getTaxClassId($item)
-    {
-        $attribute_code = Mage::getStoreConfig(self::XML_CONFIG_PATH_ODOO_TAX_CLASS_ATTRIBUTE_CODE);
-        if (isset($item[$attribute_code])) {
-            $odoo_tax_classes = $item[$attribute_code];
-            $odoo_tax_class_id = 0;
-            if (is_array($odoo_tax_classes)) {
-                foreach ($odoo_tax_classes as $id) {
-                    $odoo_tax_class_id = $id;
-                    break;
-                }
-            }
-            if ($odoo_tax_class_id) {
-                return (int)self::__toTaxClassId($odoo_tax_class_id);
-            }
-        }
-
-        return 0;
-    }
-
-    /**
-     * Get Swisspost class id, from a product
-     *
      * @param $product
      *
      * @return int
@@ -122,12 +93,9 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
     {
         static $mapping;
         $taxClassId = $product->getTaxClassId();
-        if (!isset($mapping)) {
-            $fields = array();
-        } else {
+        if (isset($mapping)) {
             return isset($mapping[$taxClassId]) ? $mapping[$taxClassId] : 0;
         }
-        $attribute_code = Mage::getStoreConfig(self::XML_CONFIG_PATH_ODOO_TAX_CLASS_ATTRIBUTE_CODE);
         $configured = Mage::helper('swisspost_api')->textToArray(
             Mage::getStoreConfig(self::XML_CONFIG_PATH_TAX_CLASS_MAPPING)
         );
