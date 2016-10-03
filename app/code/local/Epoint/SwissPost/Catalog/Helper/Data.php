@@ -105,8 +105,8 @@ class Epoint_SwissPost_Catalog_Helper_Data extends Mage_Core_Helper_Abstract
                 $mapping[strtolower($mage_tax_class_id)] = $odoo_tax_class_id;
             }
         }
-
-        return isset($mapping[$taxClassId]) ? $mapping[$taxClassId] : 0;
+        return array_key_exists($taxClassId, $mapping)
+          ? $mapping[$taxClassId] : 0;
     }
 
     /**
