@@ -42,6 +42,10 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
     
     const ENABLE_SEND_ORDER_CONFIG_PATH = 'swisspost_api/order/enable_cron';
 
+    const ENABLE_TIMEBASED_WORKFLOW = 'swisspost_api/order/enable_timebased_workflow';
+
+    const TIMEBASED_WORKFLOW_SECONDS= 'swisspost_api/order/timebased_workflow_seconds';
+
     /**
      * Get all discounts sku
      *

@@ -34,19 +34,49 @@
                             <show_in_store>0</show_in_store>
                             <comment>Only orders with date greatest than configured will be sent, format : YYYY-mm-dd</comment>
                         </from_date>
-                        <status translate="label">
-                            <label>Order status on cron search</label>
-                            <frontend_type>textarea</frontend_type>
+
+                        <enable_timebased_workflow translate="label">
+                            <label>Use timebased workflow</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>
+                                - orders with status "pending": -> transmit to Odoo, set to "complete"
+                                - orders with processing, older than 10 min with invoice: -> transmit to Odoo, set to "complete"
+                                - orders with processing, older than 10 min. and without invoice: -> set to "cancelled"
+                            </comment>
+                        </enable_timebased_workflow>
+
+                        <timebased_workflow_seconds translate="label">
+                            <label>Timebased workflow seconds</label>
+                            <frontend_type>text</frontend_type>
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment>Only orders with those statuses will be sent by the cron, many entries, comma separated.</comment>
+                            <comment>- orders with processing, older than 10 min with invoice: -> transmit to Odoo, set to "complete"
+                                - orders with processing, older than 10 min. and without invoice: -> set to "cancelled".</comment>
+                        </timebased_workflow_seconds>
+
+                        <status translate="label">
+                            <label>Order status on cron search</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Only orders with those statuses will be sent by the cron, many entries, comma separated.
+                                Invoiced orders will, be sent on Odoo, and the status will be set processing on succes.
+                                It will not be used when is enabled timebased workflow.
+                            </comment>
                         </status>
                         <cron_limit translate="label">
                             <label>Processed orders on cron execution</label>
                             <frontend_type>text</frontend_type>
-                            <sort_order>2</sort_order>
+                            <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
@@ -54,7 +84,7 @@
                         <enable_realtime translate="label">
                             <label>Send order on creation</label>
                             <frontend_type>select</frontend_type>
-                            <sort_order>10</sort_order>
+                            <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
@@ -64,7 +94,7 @@
                         <default_values translate="label">
                             <label>Default values</label>
                             <frontend_type>textarea</frontend_type>
-                            <sort_order>20</sort_order>
+                            <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
@@ -73,7 +103,7 @@
                         <comment_prefix translate="label">
                             <label>Comments prefix</label>
                             <frontend_type>textarea</frontend_type>
-                            <sort_order>30</sort_order>
+                            <sort_order>70</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
