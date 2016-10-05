@@ -33,6 +33,7 @@ class Epoint_SwissPostSales_Helper_Product extends Mage_Core_Helper_Abstract
       if($attribute){
         $product = Mage::getModel('catalog/product')->load($item->getProductId());
         if($product){
+          $line->price_unit = number_format($product->getData(self::PRODUCT_ORIGINAL_PRICE_ATTRIBUTE_CODE), 4);
           $line->discount = $product->getData(self::PRODUCT_ORIGINAL_PRICE_ATTRIBUTE_CODE)
             - $product->getPrice();
           if($line->discount > 0){
