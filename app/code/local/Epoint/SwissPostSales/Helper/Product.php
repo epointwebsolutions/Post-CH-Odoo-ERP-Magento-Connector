@@ -34,12 +34,11 @@ class Epoint_SwissPostSales_Helper_Product extends Mage_Core_Helper_Abstract
       if($attribute){
         $product = Mage::getModel('catalog/product')->load($item->getProductId());
         if($product){
-          print $product->getData(self::PRODUCT_ORIGINAL_PRICE_ATTRIBUTE_CODE);
           $line->discount =  ($product->getData(self::PRODUCT_ORIGINAL_PRICE_ATTRIBUTE_CODE)
               - $product->getPrice()) * $line->quantity;
         }
       }else{
-        $this->discount = $item->getDiscountAmount();
+        $line->discount = $item->getDiscountAmount();
       }
     }
     // convert it to percent
