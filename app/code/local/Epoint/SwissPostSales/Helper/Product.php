@@ -26,7 +26,6 @@ class Epoint_SwissPostSales_Helper_Product extends Mage_Core_Helper_Abstract
     $line->price_unit = $item->getPrice();
     $line->quantity = $item->getQtyOrdered();
     $line->discount = 0;
-    $line->quantity = 5;
     if($line->price_unit  > 0 && $line->quantity > 0){
       $attribute = Mage::getModel('eav/entity_attribute')
         ->loadByCode('catalog_product', self::PRODUCT_ORIGINAL_PRICE_ATTRIBUTE_CODE);
