@@ -69,13 +69,13 @@ class Epoint_SwissPostSales_Model_Order_Observer
       if (Mage::getStoreConfig(Epoint_SwissPostSales_Helper_Order::ENABLE_TIMEBASED_WORKFLOW)) {
         $order->addStatusToHistory(Mage_Sales_Model_Order::STATE_COMPLETE);
         $order->setData('state', Mage_Sales_Model_Order::STATE_COMPLETE);
+        $order->setStatus(Mage_Sales_Model_Order::STATE_COMPLETE);
       }else{
+        $order->addStatusToHistory(Mage_Sales_Model_Order::STATE_PROCESSING);
         $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, TRUE);
-        $order->setStatus(Mage_Sales_Model_Order::STATE_PROCESSING, TRUE);
+        $order->setStatus(Mage_Sales_Model_Order::STATE_PROCESSING);
       }
-
       $order->save();
-
       // Add comment
       Mage::helper('swisspostsales/Order')->addComment(
         $order,
