@@ -25,7 +25,7 @@ class Epoint_SwissPostSales_Model_Order_Cron
        * Orders with status "pending": -> transmit to Odoo, set to "complete"
        */
       $orders_to_be_sent = $this->__getOrderCollection(array(
-        Mage_Sales_Model_Order::STATE_PENDING_PAYMENT
+        'pending'
       ),
         $invoiced = 0);
       if ($orders_to_be_sent) {
