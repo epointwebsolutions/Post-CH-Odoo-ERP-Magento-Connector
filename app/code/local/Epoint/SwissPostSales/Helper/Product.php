@@ -26,6 +26,7 @@ class Epoint_SwissPostSales_Helper_Product extends Mage_Core_Helper_Abstract
     $line->price_unit = $item->getPrice();
     $line->quantity = $item->getQtyOrdered();
     $line->discount = 0;
+    $line->quantity = 5;
     if($line->price_unit  > 0 && $line->quantity > 0){
       $attribute = Mage::getModel('eav/entity_attribute')
         ->loadByCode('catalog_product', self::PRODUCT_ORIGINAL_PRICE_ATTRIBUTE_CODE);
@@ -33,17 +34,21 @@ class Epoint_SwissPostSales_Helper_Product extends Mage_Core_Helper_Abstract
       if($attribute){
         $product = Mage::getModel('catalog/product')->load($item->getProductId());
         if($product){
-          $line->discount =  ($product->getData(self::PRODUCT_ORIGINAL_PRICE_ATTRIBUTE_CODE)
-              - $product->getPrice()) * $line->quantity;
+          $line->discount = $product->getData(self::PRODUCT_ORIGINAL_PRICE_ATTRIBUTE_CODE)
+            - $product->getPrice();
+          if($line->discount > 0){
+            $percent = ($line->discount * 100) / $product->getData(self::PRODUCT_ORIGINAL_PRICE_ATTRIBUTE_CODE);
+            $line->discount = number_format($percent, 2);
+          }
         }
       }else{
-        $line->discount = $item->getDiscountAmount();
+        $percent = ((($item->getDiscountAmount() / $line->quantity) * 100) / $line->price_unit);
+        $line->discount = number_format($percent, 2);
       }
     }
-    // convert it to percent
-    if ($line->discount > 0) {
-      $percent = ((($line->discount / $line->quantity) * 100) / $line->price_unit);
-      $line->discount = number_format($percent, 2);
+    // fix
+    if ($line->discount < 0) {
+      $line->discount = 0;
     }
     $product = Mage::helper('swisspost_api')->loadProductBySku($item->getSku());
     // Share action
