@@ -201,8 +201,12 @@ class Epoint_SwissPost_Customer_Model_Customer_Observer
         $connection = Mage::getModel('swisspost_customer/odoo')->loadByOrder($order);
         // Get back odoo id.
         if ($result->getResult('odoo_id')) {
-        	// Reconnect data.
-            $connection->reConnect($account->account_email, 0, $result->getResult('odoo_id'));
+            $mail = $order->getCustomerEmail();
+            if($account->account_email){
+                $mail =  $account->account_email;
+            }
+        	// Reconnect data, using email.
+            $connection->reConnect($mail, 0, $result->getResult('odoo_id'));
         }
     }
 

@@ -117,9 +117,6 @@ class Epoint_SwissPost_Customer_Model_Odoo extends Mage_Core_Model_Abstract
             // Check connection with customer.
             $connection = $this->loadByMail($mail);
             // Create if not exists.
-            if (!$mail) {
-                Epoint_SwissPost_Api_Helper_Data::debug('Missing email on save odoo reconnect');
-            }
             if (!$connection) {
                 $connection->setData('odoo_id', (int)$odoo_id);
                 $connection->setData('mail', $mail);
