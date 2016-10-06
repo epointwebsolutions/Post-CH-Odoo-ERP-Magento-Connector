@@ -305,9 +305,6 @@ class Epoint_SwissPost_Api_Helper_Data extends Mage_Core_Helper_Abstract
             $lines[] = "File: " . $call['file'] . ' : line:' . $call['line'] . ': function: ' . $call['function']
                 . ' :args:' . json_encode($call['args']);
         }
-        echo '<pre>';
-        print implode("\n", $lines);
-        echo '</pre>';
         self::log(implode("\n", $lines));
     }
 }
