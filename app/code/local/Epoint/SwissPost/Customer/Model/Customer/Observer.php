@@ -205,8 +205,10 @@ class Epoint_SwissPost_Customer_Model_Customer_Observer
             if($account->account_email){
                 $mail =  $account->account_email;
             }
-        	// Reconnect data, using email.
-            $connection->reConnect($mail, 0, $result->getResult('odoo_id'));
+            if($mail) {
+                // Reconnect data, using email.
+                $connection->reConnect($mail, 0, $result->getResult('odoo_id'));
+            }
         }
     }
 
