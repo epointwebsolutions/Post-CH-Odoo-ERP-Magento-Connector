@@ -37,9 +37,11 @@ class Epoint_SwissPost_Api_Helper_MailLog extends Mage_Core_Helper_Abstract
       print implode("\n", $message);
       $mail_message = ob_get_clean();
       foreach ($emails as $email) {
-        self::sendmail(
-          $email, 'Epoint SwissPost API message', $mail_message
-        );
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) !== false) {
+          self::sendmail(
+            $email, 'Epoint SwissPost API message', $mail_message
+          );
+        }
       }
     }
   }
