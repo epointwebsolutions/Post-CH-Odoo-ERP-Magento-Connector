@@ -87,9 +87,11 @@ class Epoint_SwissPostSales_Helper_Shipping extends Mage_Core_Helper_Abstract
         $lookup_sku = Mage::getStoreConfig(self::XML_CONFIG_PATH_SHIPPING_DEFAULT);
         // Magento sku|magento shipping method
         $mapping = Mage::helper('swisspost_api')->extractDefaultValues(self::XML_CONFIG_PATH_SHIPPING_MAPPING);
+        $code = strtolower(trim($code));
         foreach ($mapping as $sku => $magento_shipping_code) {
-            if (strtolower($magento_shipping_code) == $code) {
-                $lookup_sku = $sku;
+            $magento_shipping_code = strtolower(trim($magento_shipping_code));
+            if ($magento_shipping_code == $code) {
+                $lookup_sku = trim($sku);
                 break;
             }
         }
