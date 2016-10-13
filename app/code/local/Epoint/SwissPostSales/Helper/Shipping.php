@@ -90,9 +90,19 @@ class Epoint_SwissPostSales_Helper_Shipping extends Mage_Core_Helper_Abstract
         $code = strtolower(trim($code));
         foreach ($mapping as $sku => $magento_shipping_code) {
             $magento_shipping_code = strtolower(trim($magento_shipping_code));
+
             if ($magento_shipping_code == $code) {
                 $lookup_sku = trim($sku);
                 break;
+            }
+            // Lookup on multiple
+            $magento_shipping_code = explode(',', $magento_shipping_code);
+            foreach($magento_shipping_code as $index=>$value){
+              $magento_shipping_code[$index] = trim($value);
+            }
+            if(in_array($code, $magento_shipping_code)){
+              $lookup_sku = trim($sku);
+              break;
             }
         }
         return $lookup_sku;
