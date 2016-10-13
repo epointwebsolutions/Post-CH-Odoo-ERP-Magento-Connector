@@ -67,7 +67,7 @@ class Epoint_SwissPost_Api_Helper_MailLog extends Mage_Core_Helper_Abstract
             print 'URL: ' . Mage::helper('core/url')->getCurrentUrl() . "\n";
             $mail_message = ob_get_clean();
             foreach ($emails as $email) {
-                if ($email) {
+                if (filter_var($email, FILTER_VALIDATE_EMAIL) !== false) {
                     self::sendmail(
                         $email, 'Epoint SwissPost API Exception', $mail_message,
                         Mage::getStoreConfig('trans_email/ident_general/email'),
