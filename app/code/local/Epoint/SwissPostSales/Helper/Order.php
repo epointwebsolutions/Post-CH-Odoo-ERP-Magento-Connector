@@ -548,4 +548,62 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
     }
     return $method;
   }
+
+  /**
+   * Custom lock order operation.
+   *
+   * @param $order object
+   *   Order object.
+   *
+   * @param $time int
+   *   Default 3600 seconds.
+   *
+   * @return boolean
+   */
+  static function setLocked($order, $time=3600){
+    $cacheId = 'locked_order_'.$order->getId();
+    if (false !== ($data = Mage::app()->getCache()->load($cacheId))) {
+      $data = (int)$data;
+      if($data > 0){
+        return false;
+      }
+    } else {
+      $data = (string)time();
+      Mage::app()->getCache()->save($data, $cacheId, array('orders'), $time);
+      return true;
+    }
+  }
+
+  /**
+   * Check if is locked.
+   *
+   * @param $order
+   * @return int $data
+   *
+   */
+  static function isLocked($order){
+    $cacheId = 'locked_order_'.$order->getId();
+    if (false !== ($data = Mage::app()->getCache()->load($cacheId))) {
+      $data = (int)$data;
+      if($data > 0){
+        return $data;
+      }
+    }
+    return 0;
+  }
+
+  /**
+   * Check if is locked.
+   *
+   * @param $order
+   * @return int $data
+   *
+   */
+  static function releaseLock($order){
+    $cacheId = 'locked_order_'.$order->getId();
+    if (false !== ($data = Mage::app()->getCache()->load($cacheId))) {
+      Mage::app()->getCache()->remove($cacheId);
+    }
+    return 0;
+  }
 }

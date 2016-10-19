@@ -67,11 +67,11 @@ class Epoint_SwissPostSales_Model_Order_Observer
 
       // Set state complete or processing.
       if (Mage::getStoreConfig(Epoint_SwissPostSales_Helper_Order::ENABLE_TIMEBASED_WORKFLOW)) {
-        $order->addStatusToHistory(Mage_Sales_Model_Order::STATE_COMPLETE);
+        //$order->addStatusToHistory(Mage_Sales_Model_Order::STATE_COMPLETE);
         $order->setData('state', Mage_Sales_Model_Order::STATE_COMPLETE);
         $order->setStatus(Mage_Sales_Model_Order::STATE_COMPLETE);
       }else{
-        $order->addStatusToHistory(Mage_Sales_Model_Order::STATE_PROCESSING);
+        //$order->addStatusToHistory(Mage_Sales_Model_Order::STATE_PROCESSING);
         $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, TRUE);
         $order->setStatus(Mage_Sales_Model_Order::STATE_PROCESSING);
       }
@@ -103,7 +103,7 @@ class Epoint_SwissPostSales_Model_Order_Observer
         $order->setStatus(Mage_Sales_Model_Order::STATE_HOLDED);
         $order->save();
       }else{
-        // Set it on hold
+        // Set it on processing
         $order->setState(Mage_Sales_Model_Order::STATE_PROCESSING, TRUE);
         $order->setStatus(Mage_Sales_Model_Order::STATE_PROCESSING);
         $order->save();

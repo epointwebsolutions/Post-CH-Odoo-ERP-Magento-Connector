@@ -213,25 +213,67 @@ class Epoint_SwissPostSales_Model_Order_Cron
    */
   private function __sendOrderCollection($order_collection){
     foreach ($order_collection as $order_item) {
-      $order = Mage::getModel('sales/order')->load($order_item->getId());
-      // check if can be sent again
-      if(Mage::helper('swisspostsales/Order')->isConnected($order)){
-        Mage::helper('swisspost_api')->log(
-          Mage::helper('core')->__('Stop sending again order: %s, odoo id: %s', $order->getId(),
-            $order->getData(Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID)
+      try {
+        $order = Mage::getModel('sales/order')->load($order_item->getId());
+        // Check if is locked.
+        if(Epoint_SwissPostSales_Helper_Order::isLocked($order)) {
+          throw new Exception('Try to send an order that is locked.');
+        }
+        // Set locked for 4*3600 seconds.
+        if(!Epoint_SwissPostSales_Helper_Order::setLocked($order, 4*3600)) {
+          throw new Exception('Set order locked fails');
+        }
+        // check if can be sent again
+        if (Mage::helper('swisspostsales/Order')->isConnected($order)) {
+          throw new Exception('Try to send an order that is already connected.');
+        }
+        // The order was not invoiced ???
+        if (!$order->getInvoiceCollection()) {
+          throw new Exception('Try to send an order that is is not invoiced.');
+        }
+        // The order was not invoiced ???
+        if (!$order->getInvoiceCollection()) {
+          throw new Exceptiont('Try to send an order that is is not invoiced.');
+        }
+
+        // Set status holded.
+        $order->setState(Mage_Sales_Model_Order::STATE_HOLDED);
+        $order->save();
+        // Reload order and send it.
+        $order = Mage::getModel('sales/order')->load($order_item->getId());
+        // Add comment
+        Mage::helper('swisspostsales/Order')->addComment(
+          $order,
+          Mage::helper('core')->__('Send order to odoo, set status holded.')
+        );
+        Mage::helper('swisspost_api/Order')->createSaleOrder($order);
+      }catch (Exception $e){
+        // Log exception
+        Mage::logException($e);
+        // Set status holded.
+        if($order->getState() <> Mage_Sales_Model_Order::STATE_HOLDED) {
+          $order->setState(Mage_Sales_Model_Order::STATE_HOLDED);
+          $order->save();
+        }
+        // Notify Error
+        Mage::helper('swisspostsales/Order')->addComment(
+          $order,
+          Mage::helper('core')->__(
+            'Send order return ERROR from Odoo: %s',
+           $e->getMessage()
           )
         );
-        continue;
-      }
-      // The order was not invoiced ???
-      if(!$order->getInvoiceCollection()){
         Mage::helper('swisspost_api')->log(
-          Mage::helper('core')->__('Stop sending again order, no invoice: %s', $order->getId()
-          )
+          Mage::helper('core')
+            ->__('Error sending again order: %s, odoo id: %s, error: %s',
+              $order->getId(),
+              $order->getData(
+                Epoint_SwissPostSales_Helper_Data::ORDER_ATTRIBUTE_CODE_ODOO_ID
+              ),
+              $e->getMessage()
+            )
         );
-        continue;
       }
-      Mage::helper('swisspost_api/Order')->createSaleOrder($order);
     }
   }
 
