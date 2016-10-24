@@ -86,8 +86,8 @@ class Epoint_SwissPostSales_Helper_Product extends Mage_Core_Helper_Abstract
           $line->tax_id = array_map('trim', explode(',', $line->tax_id));
         }
 
-        if(isset($line->prince_unit)){
-          $line->prince_unit = number_format((float)$line->prince_unit - $discount_amount, 2);
+        if(isset($line->price_unit)){
+          $line->price_unit = number_format((float)$line->price_unit - $discount_amount, 2);
         };
         // Share action
         Mage::dispatchEvent(
