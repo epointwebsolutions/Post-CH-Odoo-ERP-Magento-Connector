@@ -188,7 +188,7 @@
                     </fields>
                 </order_shipping_method>
                 <discount translate="label comment" module="swisspostsales">
-                    <label>Discount mapping</label>
+                    <label>Discount settings</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>12345</sort_order>
                     <show_in_default>1</show_in_default>
@@ -206,6 +206,35 @@
                                 SKU1|catalog:1, if is a shopping cart rule: SKU2|shoppingcart:1
                             </comment>
                         </mapping2products>
+
+                        <enable_discount2product>
+                            <label>Enable Discount product line</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <comment>If is enabled the discount will be added on order</comment>
+                        </enable_discount2product>
+
+                        <discount2product>
+                            <label>Discount product line</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>
+                                Ex, for configuration:  [{'product': 'DISCOUNT', 'name': 'Discount Coupon', 'price_unit': '-20', 'discount': 0, 'quantity': '1.0000', 'tax_id': ['TAX_80']}]
+                                product|DISCOUNT
+                                name|Discount Coupon
+                                prince_unit|0
+                                quantity|1
+                                discount|0
+                                tax_id|TAX_80
+                            </comment>
+                        </discount2product>
                     </fields>
                 </discount>
                 

@@ -62,4 +62,44 @@ class Epoint_SwissPostSales_Helper_Product extends Mage_Core_Helper_Abstract
     );
     return (array)$line;
   }
+
+  /**
+   * Convert the order discount into odoo order line.
+   *
+   * @param $order
+   *
+   * @return array
+   */
+  public static function __toSwissPostDiscountOrderLine($order)
+  {
+    if (Mage::getStoreConfig(Epoint_SwissPostSales_Helper_Order::ENABLE_ORDER_DISCOUNT_PRODUCT_LINE)) {
+      if($order->getDiscountAmount() <> 0){
+        $discount_amount = abs($order->getDiscountAmount());
+        $config  = Epoint_SwissPost_Api_Helper_Data::extractDefaultValues(
+          Epoint_SwissPostSales_Helper_Order::ORDER_DISCOUNT_PRODUCT_LINE
+        );
+        $line = new stdClass();
+        foreach ($config as $property=>$value){
+          $line->{$property} = $value;
+        }
+        if(isset($line->tax_id) && !is_array($line->tax_id)){
+          $line->tax_id = array_map('trim', explode(',', $line->tax_id));
+        }
+
+        if(isset($line->prince_unit)){
+          $line->prince_unit = number_format((float)$line->prince_unit - $discount_amount, 2);
+        };
+        // Share action
+        Mage::dispatchEvent(
+          'swisspost_api_order_prepare_discount_line',
+          array(
+            'order'   => $order,
+            'line'    => $line,
+          )
+        );
+        return (array)$line;
+      }
+    }
+    return null;
+  }
 }

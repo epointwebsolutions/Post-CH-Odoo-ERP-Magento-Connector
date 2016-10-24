@@ -33,8 +33,13 @@ class Epoint_SwissPostSales_Model_Order_Observer
     }
     $orderProducts = $order->getAllVisibleItems();
     $order_lines = array();
+    // Product line.
     foreach ($orderProducts as $item) {
       $order_lines[] = Mage::helper('swisspostsales/Product')->__toSwisspostOrderLine($order, $item);
+    }
+    // Discount order line.
+    if($discountLine = Mage::helper('swisspostsales/Product')->__toSwissPostDiscountOrderLine($order)){
+      $order_lines[] = $discountLine;
     }
     // Attach shipping line
     $shippingLine = Mage::helper('swisspostsales/Shipping')->__toSwisspostShippingLine($order);
