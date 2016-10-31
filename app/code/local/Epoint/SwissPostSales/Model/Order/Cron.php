@@ -237,8 +237,18 @@ class Epoint_SwissPostSales_Model_Order_Cron
         }
 
         // Set status holded.
-        $order->setState(Mage_Sales_Model_Order::STATE_HOLDED);
+        $order->addStatusHistoryComment(
+          Mage::helper('core')->__('Set order on hold, prepare to send.'),
+          Mage_Sales_Model_Order::STATE_HOLDED
+        );
         $order->save();
+        // Log message
+        Mage::helper('swisspost_api')->log(
+          Mage::helper('core')
+            ->__('Set order status on hold: %s',
+              $order->getId()
+            )
+        );
         // Reload order and send it.
         $order = Mage::getModel('sales/order')->load($order_item->getId());
         // Add comment

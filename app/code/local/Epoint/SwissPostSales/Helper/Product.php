@@ -38,12 +38,12 @@ class Epoint_SwissPostSales_Helper_Product extends Mage_Core_Helper_Abstract
             - $product->getPrice();
           if($line->discount > 0){
             $percent = ($line->discount * 100) / $product->getData(self::PRODUCT_ORIGINAL_PRICE_ATTRIBUTE_CODE);
-            $line->discount = number_format($percent, 2);
+            $line->discount = number_format($percent, 4);
           }
         }
       }else{
         $percent = ((($item->getDiscountAmount() / $line->quantity) * 100) / $line->price_unit);
-        $line->discount = number_format($percent, 2);
+        $line->discount = number_format($percent, 4);
       }
     }
     // fix
