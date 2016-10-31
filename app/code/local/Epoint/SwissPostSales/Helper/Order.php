@@ -47,6 +47,14 @@ class Epoint_SwissPostSales_Helper_Order extends Mage_Core_Helper_Abstract
   const TIMEBASED_WORKFLOW_SECONDS= 'swisspost_api/order/timebased_workflow_seconds';
 
   /**
+   * Odoo order line discount.
+   */
+  const ENABLE_ORDER_DISCOUNT_PRODUCT_LINE = 'swisspost_api/discount/enable_discount2product';
+
+  const ORDER_DISCOUNT_PRODUCT_LINE = 'swisspost_api/discount/discount2product';
+
+  
+  /**
    * Get all discounts sku
    *
    * @return array
