@@ -20,4 +20,4 @@ Contributors: Swiss Post, Camptocamp, Brain-Tec</p>
 - Reformat code</p>
 
 <h3>Support</h3>
-Liviu Nicolicioiu – liviu.nicolicioiu@epoint.ro 
+epoint – support@epoint.ro 
